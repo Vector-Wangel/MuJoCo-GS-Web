@@ -12,9 +12,8 @@
 
   <asset>
     <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
-    <texture type="2d" name="groundplane" builtin="flat" mark="edge" rgb1="0.1 0.1 0.1" rgb2="0.3 0.5 0.3"
-      markrgb="0.8 0.8 0.8" width="300" height="300"/>
-    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
+    <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="obj_red" rgba="0.8 0.2 0.2 1"/>
     <material name="obj_green" rgba="0.2 0.8 0.2 1"/>
     <material name="obj_blue" rgba="0.2 0.2 0.8 1"/>
@@ -24,32 +23,32 @@
   <worldbody>
     <light pos="0 0 3" dir="0 0 -1" directional="false"/>
     <!-- Floor with friction: sliding rolling torsional -->
-    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" contype="1" conaffinity="1" friction="1 0.005 0.0001"/>
+    <geom name="floor" size="0 0 0.05" type="plane" material="grid" contype="1" conaffinity="1" friction="0.5 0.005 0.0001"/>
     
     <!-- Simple geometric objects for manipulation with friction -->
     <body name="box1" pos="0.5 0.3 0.5">
       <freejoint/>
-      <geom type="box" size="0.05 0.05 0.05" material="obj_red" mass="0.1" contype="1" conaffinity="1" friction="1 0.005 0.0001"/>
+      <geom type="box" size="0.05 0.05 0.05" material="obj_red" mass="0.1" contype="1" conaffinity="1" friction="0.5 0.01 0.003"/>
     </body>
     
     <body name="sphere1" pos="0.3 0.5 0.5">
       <freejoint/>
-      <geom type="sphere" size="0.04" material="obj_green" mass="0.1" contype="1" conaffinity="1" friction="1 0.005 0.0001"/>
+      <geom type="sphere" size="0.04" material="obj_green" mass="0.1" contype="1" conaffinity="1" friction="0.5 0.01 0.003"/>
     </body>
     
     <body name="cylinder1" pos="-0.3 0.4 0.5">
       <freejoint/>
-      <geom type="cylinder" size="0.03 0.06" material="obj_blue" mass="0.1" contype="1" conaffinity="1" friction="1 0.005 0.0001"/>
+      <geom type="cylinder" size="0.03 0.06" material="obj_blue" mass="0.1" contype="1" conaffinity="1" friction="0.5 0.01 0.003"/>
     </body>
     
     <body name="box2" pos="-0.5 -0.3 0.5">
       <freejoint/>
-      <geom type="box" size="0.04 0.04 0.04" material="obj_yellow" mass="0.1" contype="1" conaffinity="1" friction="1 0.005 0.0001"/>
+      <geom type="box" size="0.04 0.04 0.04" material="obj_yellow" mass="0.1" contype="1" conaffinity="1" friction="0.5 0.01 0.003"/>
     </body>
     
     <body name="sphere2" pos="0.4 -0.4 0.5">
       <freejoint/>
-      <geom type="sphere" size="0.035" material="obj_red" mass="0.1" contype="1" conaffinity="1" friction="1 0.005 0.0001"/>
+      <geom type="sphere" size="0.035" material="obj_red" mass="0.1" contype="1" conaffinity="1" friction="0.5 0.01 0.003"/>
     </body>
   </worldbody>
 
