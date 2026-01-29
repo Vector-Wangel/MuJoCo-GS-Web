@@ -12,7 +12,7 @@
 
   <asset>
     <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
-    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
+    <texture name="grid" type="2d" builtin="checker" width="256" height="256" rgb1=".1 .2 .3" rgb2=".2 .3 .4"/>
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2"/>
     <material name="obj_red" rgba="0.8 0.2 0.2 1"/>
     <material name="obj_green" rgba="0.2 0.8 0.2 1"/>

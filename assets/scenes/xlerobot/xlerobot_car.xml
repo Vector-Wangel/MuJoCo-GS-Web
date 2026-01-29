@@ -46,14 +46,6 @@
   <default>
     <!-- Default: all geoms don't participate in collision -->
     <geom contype="0" conaffinity="0" condim="1" solref="0.005 1"/>
-    <!-- Wheel defaults (similar to car) -->
-    <default class="wheel">
-      <joint damping="0.03" actuatorfrcrange="-0.5 0.5"/>
-      <geom type="cylinder" group="3" size="0.05 0.02" rgba="0.5 0.5 1 1" contype="1" conaffinity="1" condim="6" friction="0.8 0.02 0.003"/>
-    </default>
-    <default class="caster">
-      <geom type="sphere" group="3" size="0.02" rgba="0.7 0.7 0.7 1" contype="1" conaffinity="1" condim="1" priority="1"/>
-    </default>
     <!-- STS3215 motor properties (from SO101) -->
     <default class="sts3215">
       <geom contype="0" conaffinity="0"/>
@@ -71,46 +63,28 @@
   <worldbody>
     <light directional="true" pos="-0.5 0.5 3" dir="0 0 -1"/>
     
-    <!-- Chassis with freejoint (similar to car) - not fixed to ground -->
+    <!-- Simplified chassis with prismatic (x, y) and rotation (z) joints -->
     <body name="chassis" pos="0 0 0.38">
-      <freejoint/>
+      <joint name="slide_joint_x" type="slide" axis="1 0 0" damping="100" frictionloss="10" range="-20 20"/>
+      <joint name="slide_joint_y" type="slide" axis="0 1 0" damping="100" frictionloss="10" range="-20 20"/>
+      <joint name="hinge_joint_z" type="hinge" axis="0 0 1" damping="50" frictionloss="1"/>
       
       <!-- Simplified base_link visual representation -->
       <!-- <geom type="box" size="0.2 0.2 0.38" pos="0 0 0.35" rgba="0.2 0.2 0.6 0.3" class="visual"/>
       <geom type="box" size="0.1575 0.2025 0.045" pos="0 0 0.73" rgba="0.6 0.5 0.1 0.5" class="visual"/> -->
       <!-- Collision geoms for base_link (URDF positions are relative to base_link origin at z=0, chassis is at z=0.38, so subtract 0.38) -->
       <geom type="box" size="0.19565 0.2295 0.05" pos="0 0 -0.3" class="collision" friction="1 0.005 0.0001" rgba="0.3 0.3 0.9 0.4"/>
-      <geom type="box" size="0.1575 0.2025 0.295" pos="0 0 0.015" class="collision" friction="1 0.005 0.0001" rgba="0.9 0.3 0.3 0.4"/>
+      <geom type="box" size="0.2575 0.2025 0.295" pos="0 0 0.015" class="collision" friction="1 0.005 0.0001" rgba="0.9 0.3 0.3 0.4"/>
       <geom type="box" size="0.045 0.018 0.34" pos="0 -0.216 0.06" class="collision" friction="1 0.005 0.0001" rgba="0.3 0.9 0.3 0.4"/>
       <geom type="box" size="0.045 0.018 0.34" pos="0 0.216 0.06" class="collision" friction="1 0.005 0.0001" rgba="0.9 0.9 0.3 0.4"/>
       
-      <!-- Base link inertial properties (mass set to 0, mass moved to wheels) -->
-      <inertial pos="0 0 -0.38" mass="10" diaginertia="0.001 0.001 0.001"/>
+      <!-- Base link inertial properties -->
+      <inertial pos="0 0 0.38" mass="70.1294" diaginertia="1.225 1.2853 0.987"/>
       
       <!-- Raskog visual meshes -->
       <geom type="mesh" mesh="raskogbody" pos="-0.01668 0.502 0.515" euler="1.5708 0 0" material="blue" class="visual"/>
       <geom type="mesh" mesh="raskogwheel1" pos="-0.01668 0.502 0.515" euler="1.5708 0 0" material="grey" class="visual"/>
       <geom type="mesh" mesh="raskogwheel2" pos="-0.01668 0.502 0.515" euler="1.5708 0 0" material="motor" class="visual"/>
-      
-      <!-- Drive wheels (active wheels, similar to car) -->
-      <!-- Positioned at the bottom of chassis, with wheels touching the ground -->
-      <body name="left_wheel" pos="-0.15 0.225 -0.32" zaxis="0 1 0">
-        <joint name="left_wheel_joint"/>
-        <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
-        <geom class="wheel"/>
-      </body>
-      <body name="right_wheel" pos="-0.15 -0.225 -0.32" zaxis="0 1 0">
-        <joint name="right_wheel_joint"/>
-        <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
-        <geom class="wheel"/>
-      </body>
-      
-      <!-- Caster wheels (passive wheels, similar to car's front wheel) -->
-      <!-- Positioned at the bottom of chassis, touching the ground -->
-      <!-- Note: caster wheels are geoms (not bodies) with zero friction for free rolling -->
-      <!-- Use condim="1" and priority="1" to match car.xml's front wheel and avoid friction -->
-      <geom name="front_caster" pos="0.15 -0.225 -0.35" type="sphere" size="0.02" rgba="0.7 0.7 0.7 1" contype="1" conaffinity="1" condim="1" priority="1" group="3"/>
-      <geom name="back_caster" pos="0.15 0.225 -0.35" type="sphere" size="0.02" rgba="0.7 0.7 0.7 1" contype="1" conaffinity="1" condim="1" priority="1" group="3"/>
 
       <!-- First Arm -->
       <body name="Base" pos="-0.135 -0.133 0.38" euler="0 0 1.5708">
@@ -280,21 +254,21 @@
 
       <!-- Top base (URDF: top_base_joint origin is xyz="0 0 0.73" relative to base_link at z=0, chassis is at z=0.38, so pos should be 0.73-0.38=0.35) -->
       <body name="top_base_link" pos="0 0 0.35">
-        <inertial pos="0 0 0" mass="0.2542" diaginertia="0.0045 0.005 0.0045"/>
+        <inertial pos="0 0 0" mass="4.3542" diaginertia="0.0045 0.005 0.0045"/>
         <!-- Visual meshes -->
         <geom type="mesh" mesh="topbase1" pos="0.016 -0.006 -0.727" material="white" class="visual"/>
         <geom type="mesh" mesh="topbase2" pos="0.016 -0.006 -0.727" material="motor" class="visual"/>
         
         <!-- Head -->
         <body name="head_pan_link" pos="-0.178 0 0">
-          <inertial pos="0 0 0" mass="0.2556" diaginertia="0.0129 0.0095 0.0184"/>
+          <inertial pos="0 0 0" mass="2.2556" diaginertia="0.0129 0.0095 0.0184"/>
           <joint name="head_pan_joint" type="hinge" axis="0 0 1" range="-1.57 1.57" class="sts3215"/>
           <!-- Visual meshes -->
           <geom type="mesh" mesh="tophead3" pos="0.194 -0.006 -0.73" material="white" class="visual"/>
           <geom type="mesh" mesh="tophead4" pos="0.194 -0.006 -0.73" material="motor" class="visual"/>
           
           <body name="head_tilt_link" pos="0.031 0 0.43815">
-            <inertial pos="0 0 0" mass="0.02087" diaginertia="0.0061 0.0014 0.0061"/>
+            <inertial pos="0 0 0" mass="0.9087" diaginertia="0.0061 0.0014 0.0061"/>
             <joint name="head_tilt_joint" type="hinge" axis="0 1 0" range="-0.76 1.45" class="sts3215"/>
             <!-- Visual meshes -->
             <geom type="mesh" mesh="tophead5" pos="0.16265 -0.006 -1.16815" material="white" class="visual"/>
@@ -350,23 +324,11 @@
     <exclude body1="chassis" body2="Base_2"/>
   </contact>
 
-  <tendon>
-    <!-- Forward/backward movement: left and right wheels rotate together -->
-    <fixed name="forward">
-      <joint joint="left_wheel_joint" coef="0.5"/>
-      <joint joint="right_wheel_joint" coef="0.5"/>
-    </fixed>
-    <!-- Turning: left and right wheels rotate in opposite directions -->
-    <fixed name="turn">
-      <joint joint="left_wheel_joint" coef="-0.5"/>
-      <joint joint="right_wheel_joint" coef="0.5"/>
-    </fixed>
-  </tendon>
-
   <actuator>
-    <!-- Chassis actuators (car-like control using wheels) -->
-    <motor name="forward" tendon="forward" ctrlrange="-1 1"/>
-    <motor name="turn" tendon="turn" ctrlrange="-1 1"/>
+    <!-- Chassis actuators -->
+    <velocity name="slider_actuator_x" joint="slide_joint_x" kv="200"/>
+    <velocity name="slider_actuator_y" joint="slide_joint_y" kv="0"/>
+    <velocity name="hinge_actuator_z" joint="hinge_joint_z" kv="100"/>
 
     <!-- First arm actuators (SO101 STS3215 parameters with SO101 joint ranges) -->
     <position class="sts3215" name="Rotation_L" joint="Rotation_L" forcerange="-3.35 3.35" ctrlrange="-1.91986 1.91986"/>

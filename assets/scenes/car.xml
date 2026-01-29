@@ -38,13 +38,13 @@
         <joint name="left"/>
         <geom class="wheel"/>
         <site class="decor" size=".006 .025 .012"/>
-        <site class="decor" size=".025 .006 .012"/>
+
       </body>
       <body name="right wheel" pos="-.07 -.06 0" zaxis="0 1 0">
         <joint name="right"/>
         <geom class="wheel"/>
         <site class="decor" size=".006 .025 .012"/>
-        <site class="decor" size=".025 .006 .012"/>
+
       </body>
     </body>
   </worldbody>
