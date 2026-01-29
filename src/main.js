@@ -4,6 +4,7 @@ import { GUI              } from '../node_modules/three/examples/jsm/libs/lil-gu
 import { OrbitControls    } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
 import { DragStateManager } from './utils/DragStateManager.js';
 import { setupGUI, downloadExampleScenesFolder, loadSceneFromURL, drawTendonsAndFlex, getPosition, getQuaternion, toMujocoPos, standardNormal } from './mujocoUtils.js';
+import { keyboardController } from './utils/KeyboardControl.js';
 import   load_mujoco        from '../node_modules/mujoco-js/dist/mujoco_wasm.js';
 
 // ===== 新增：后处理相关 =====
@@ -232,6 +233,9 @@ export class MuJoCoDemo {
 
           // TODO: Apply pose perturbations (mocap bodies only).
         }
+
+        // Update keyboard controls
+        keyboardController.update();
 
         mujoco.mj_step(this.model, this.data);
 

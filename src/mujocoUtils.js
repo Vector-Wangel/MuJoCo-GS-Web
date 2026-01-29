@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Reflector  } from './utils/Reflector.js';
 import { MuJoCoDemo } from './main.js';
+import { keyboardController } from './utils/KeyboardControl.js';
 
 export async function reloadFunc() {
   // Delete the old scene and load the new scene
@@ -242,6 +243,40 @@ export function setupGUI(parentContext) {
     actuatorGUIs = addActuators(model, data, parentContext.params);
   });
   actuatorFolder.close();
+
+  // Add Keyboard Controls folder (only shown for scenes with keyboard config)
+  let keyboardFolder = null;
+  let keyboardLabel = null;
+
+  const setupKeyboardControls = (model, data, params) => {
+    // Remove existing folder if any
+    if (keyboardFolder) {
+      keyboardFolder.destroy();
+      keyboardFolder = null;
+      keyboardLabel = null;
+    }
+
+    // Check if current scene has keyboard control config
+    if (keyboardController.hasConfig(params.scene)) {
+      keyboardController.enable(params.scene, model, data);
+
+      keyboardFolder = simulationFolder.addFolder("Keyboard Controls");
+      // Add description label
+      const desc = keyboardController.getDescription();
+      keyboardLabel = keyboardFolder.add({ info: desc }, 'info').name('Keys').disable();
+      keyboardFolder.open();
+    } else {
+      keyboardController.disable();
+    }
+  };
+
+  // Setup for initial scene
+  setupKeyboardControls(parentContext.model, parentContext.data, parentContext.params);
+
+  // Update when scene changes
+  parentContext.updateGUICallbacks.push((model, data, params) => {
+    setupKeyboardControls(model, data, params);
+  });
 
   // Add function that resets the camera to the default position.
   // Can be triggered by pressing ctrl + A.
