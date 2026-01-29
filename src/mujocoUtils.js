@@ -485,16 +485,12 @@ export async function loadSceneFromURL(mujoco, filename, parent) {
         }
       }
 
-      // Create a new material for each geom to avoid cross-contamination
-      let currentMaterial = new THREE.MeshPhysicalMaterial({
+      // ===== 修改：使用 Toon 材质实现 NPR 风格 =====
+      let currentMaterial = new THREE.MeshToonMaterial({
         color: new THREE.Color(color[0], color[1], color[2]),
         transparent: color[3] < 1.0,
-        opacity: color[3]/255.,
-        specularIntensity: model.geom_matid[g] != -1 ?       model.mat_specular   [model.geom_matid[g]] : undefined,
-        reflectivity     : model.geom_matid[g] != -1 ?       model.mat_reflectance[model.geom_matid[g]] : undefined,
-        roughness        : model.geom_matid[g] != -1 ? 1.0 - model.mat_shininess  [model.geom_matid[g]] : undefined,
-        metalness        : model.geom_matid[g] != -1 ?       0.1 : undefined, //model.mat_metallic   [model.geom_matid[g]]
-        map              : texture
+        opacity: color[3] < 1.0 ? color[3] : 1.0,
+        map: texture
       });
 
       let mesh;// = new THREE.Mesh();

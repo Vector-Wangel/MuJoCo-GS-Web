@@ -6,6 +6,12 @@ import { DragStateManager } from './utils/DragStateManager.js';
 import { setupGUI, downloadExampleScenesFolder, loadSceneFromURL, drawTendonsAndFlex, getPosition, getQuaternion, toMujocoPos, standardNormal } from './mujocoUtils.js';
 import   load_mujoco        from '../node_modules/mujoco-js/dist/mujoco_wasm.js';
 
+// ===== 新增：后处理相关 =====
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
 // Load the MuJoCo Module
 const mujoco = await load_mujoco();
 
@@ -95,6 +101,75 @@ export class MuJoCoDemo {
 
     // Initialize the Drag State Manager.
     this.dragStateManager = new DragStateManager(this.scene, this.renderer, this.camera, this.container.parentElement, this.controls);
+
+    // ===== 新增：Toon 后处理 =====
+    this.setupToonRendering();
+  }
+
+  // ===== 新增：Toon 渲染设置方法 =====
+  setupToonRendering() {
+    // 创建后处理管线
+    this.composer = new EffectComposer(this.renderer);
+
+    // 基础渲染 Pass
+    const renderPass = new RenderPass(this.scene, this.camera);
+    this.composer.addPass(renderPass);
+
+    // 描边 Shader
+    const OutlineShader = {
+      uniforms: {
+        'tDiffuse': { value: null },
+        'resolution': { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        'outlineColor': { value: new THREE.Color(0x000000) },
+        'outlineThickness': { value: 1.0 }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform vec2 resolution;
+        uniform vec3 outlineColor;
+        uniform float outlineThickness;
+        varying vec2 vUv;
+
+        void main() {
+          vec2 texel = vec2(outlineThickness) / resolution;
+
+          // 采样周围像素
+          vec4 center = texture2D(tDiffuse, vUv);
+          vec4 left   = texture2D(tDiffuse, vUv - vec2(texel.x, 0.0));
+          vec4 right  = texture2D(tDiffuse, vUv + vec2(texel.x, 0.0));
+          vec4 top    = texture2D(tDiffuse, vUv + vec2(0.0, texel.y));
+          vec4 bottom = texture2D(tDiffuse, vUv - vec2(0.0, texel.y));
+
+          // 简单边缘检测（基于颜色差异）
+          float edge = 0.0;
+          edge += length(center.rgb - left.rgb);
+          edge += length(center.rgb - right.rgb);
+          edge += length(center.rgb - top.rgb);
+          edge += length(center.rgb - bottom.rgb);
+          edge = edge / 4.0;
+
+          // 阈值化
+          float outline = smoothstep(0.05, 0.15, edge);
+
+          // 混合描边
+          vec3 finalColor = mix(center.rgb, outlineColor, outline);
+          gl_FragColor = vec4(finalColor, center.a);
+        }
+      `
+    };
+
+    this.outlinePass = new ShaderPass(OutlineShader);
+    this.composer.addPass(this.outlinePass);
+
+    // 输出 Pass
+    this.composer.addPass(new OutputPass());
   }
 
   async init() {
@@ -113,6 +188,10 @@ export class MuJoCoDemo {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize( window.innerWidth, window.innerHeight );
+
+    // ===== 新增：更新后处理尺寸 =====
+    this.composer.setSize(window.innerWidth, window.innerHeight);
+    this.outlinePass.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
   }
 
   render(timeMS) {
@@ -213,7 +292,8 @@ export class MuJoCoDemo {
     drawTendonsAndFlex(this.mujocoRoot, this.model, this.data);
 
     // Render!
-    this.renderer.render( this.scene, this.camera );
+    // this.renderer.render( this.scene, this.camera );  // 原始渲染
+    this.composer.render();  // ===== 改用后处理渲染 =====
   }
 }
 
