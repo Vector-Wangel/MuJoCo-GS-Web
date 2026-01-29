@@ -261,9 +261,14 @@ export function setupGUI(parentContext) {
       keyboardController.enable(params.scene, model, data);
 
       keyboardFolder = simulationFolder.addFolder("Keyboard Controls");
-      // Add description label
+      // Add description labels - support multi-line descriptions
       const desc = keyboardController.getDescription();
-      keyboardLabel = keyboardFolder.add({ info: desc }, 'info').name('Keys').disable();
+      const lines = desc.split('\n');
+      keyboardLabel = [];
+      for (let i = 0; i < lines.length; i++) {
+        const label = keyboardFolder.add({ info: lines[i] }, 'info').name('').disable();
+        keyboardLabel.push(label);
+      }
       keyboardFolder.open();
     } else {
       keyboardController.disable();
