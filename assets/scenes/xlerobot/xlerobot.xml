@@ -41,7 +41,7 @@
     <mesh name="raskogwheel2" file="raskogwheel2.stl" scale="0.0009 0.001 0.0009"/>
     <mesh name="topbase1" file="topbase1.stl" scale="0.001 0.001 0.001"/>
     <mesh name="topbase2" file="topbase2.stl" scale="0.001 0.001 0.001"/>
-    <mesh name="tophead3" file="tophead3.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="tophead1" file="tophead1.stl" scale="0.001 0.001 0.001"/>
     <mesh name="tophead4" file="tophead4.stl" scale="0.001 0.001 0.001"/>
     <mesh name="tophead5" file="tophead5.stl" scale="0.001 0.001 0.001"/>
     <mesh name="tophead6" file="tophead6.stl" scale="0.001 0.001 0.001"/>
@@ -121,7 +121,7 @@
       <geom name="back_caster" pos="0.15 0.225 -0.35" type="sphere" size="0.02" rgba="0.7 0.7 0.7 1" contype="1" conaffinity="1" condim="1" priority="1" group="3"/>
 
       <!-- First Arm -->
-      <body name="Base" pos="-0.135 -0.133 0.38" euler="0 0 1.5708">
+      <body name="Base" pos="-0.09 -0.11 0.395" euler="0 0 0">
         <inertial pos="0.0137179 -5.19711e-05 0.0334843" mass="0.147" fullinertia="0.000114686 0.000136117 0.000130364 -4.59787e-07 4.97151e-06 9.75275e-08"/>
         <!-- Visual meshes -->
         <geom type="mesh" mesh="Base" material="white" class="visual"/>
@@ -204,7 +204,7 @@
       </body>
 
       <!-- Second Arm -->
-      <body name="Base_2" pos="-0.135 0.133 0.38" euler="0 0 1.5708">
+      <body name="Base_2" pos="-0.09 0.11 0.395" euler="0 0 3.14159265">
         <inertial pos="0.0137179 -5.19711e-05 0.0334843" mass="0.147" fullinertia="0.000114686 0.000136117 0.000130364 -4.59787e-07 4.97151e-06 9.75275e-08"/>
         <!-- Visual meshes -->
         <geom type="mesh" mesh="Base" material="white" class="visual"/>
@@ -290,18 +290,18 @@
       <body name="top_base_link" pos="0 0 0.35">
         <inertial pos="0 0 0" mass="0.2542" diaginertia="0.0045 0.005 0.0045"/>
         <!-- Visual meshes -->
-        <geom type="mesh" mesh="topbase1" pos="0.016 -0.006 -0.727" material="white" class="visual"/>
-        <geom type="mesh" mesh="topbase2" pos="0.016 -0.006 -0.727" material="motor" class="visual"/>
+        <geom type="mesh" mesh="topbase1" pos="-0.44 -0.005 -0.6" euler="0 0 0" material="white" class="visual"/>
+        <geom type="mesh" mesh="topbase2" pos="-0.298 0.006 -0.715" euler="0 0 3.14" material="motor" class="visual"/>
         
         <!-- Head -->
-        <body name="head_pan_link" pos="-0.178 0 0">
+        <body name="head_pan_link" pos="-0.103 0 0.323">
           <inertial pos="0 0 0" mass="0.2556" diaginertia="0.0129 0.0095 0.0184"/>
-          <joint name="head_pan_joint" type="hinge" axis="0 0 1" range="-1.57 1.57" class="sts3215"/>
+          <joint name="head_pan_joint" type="hinge" axis="0 0 1" range="-3.2 3.2" class="sts3215"/>
           <!-- Visual meshes -->
-          <geom type="mesh" mesh="tophead3" pos="0.194 -0.006 -0.73" material="white" class="visual"/>
-          <geom type="mesh" mesh="tophead4" pos="0.194 -0.006 -0.73" material="motor" class="visual"/>
+          <geom type="mesh" mesh="tophead1" pos="-0.335 -0.005 -0.923" material="white" class="visual"/>
+          <geom type="mesh" mesh="tophead4" pos="1.17 -0.009 0.262" euler="3.14 -1.57 3.14" material="motor" class="visual"/>
           
-          <body name="head_tilt_link" pos="0.031 0 0.43815">
+          <body name="head_tilt_link" pos="0.001 0.002 0.09815" euler="0 0 3.14159265">
             <inertial pos="0 0 0" mass="0.02087" diaginertia="0.0061 0.0014 0.0061"/>
             <joint name="head_tilt_joint" type="hinge" axis="0 1 0" range="-0.76 1.45" class="sts3215"/>
             <!-- Visual meshes -->
@@ -393,7 +393,7 @@
     <position class="sts3215" name="Jaw_R" joint="Jaw_R" forcerange="-10 10" ctrlrange="-0.37453 1.74533"/>
 
     <!-- Head actuators (SO101 STS3215 parameters) -->
-    <position class="sts3215" name="head_pan" joint="head_pan_joint" ctrlrange="-1.57 1.57"/>
+    <position class="sts3215" name="head_pan" joint="head_pan_joint" ctrlrange="-3.2 3.2"/>
     <position class="sts3215" name="head_tilt" joint="head_tilt_joint" ctrlrange="-0.76 1.45"/>
   </actuator>
 </mujoco>
