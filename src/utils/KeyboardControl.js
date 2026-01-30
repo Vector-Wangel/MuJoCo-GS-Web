@@ -95,12 +95,12 @@ class XLeRobotController {
     this.EE_STEP = 0.0002;      // 0.005 / 8
     this.PITCH_STEP = 0.0025;     // 0.02 / 8
     this.TIP_LENGTH = 0.108;      // Length from wrist to end effector tip
-    this.BASE_SPEED = 0.5;
+    this.BASE_SPEED = 2;
 
     // Gripper positions
     this.GRIPPER_OPEN = 1.5;
-    this.GRIPPER_CLOSED = 0.1;
-    this.GRIPPER_COOLDOWN_FRAMES = 30;  // Frames to wait between toggles
+    this.GRIPPER_CLOSED = -0.2;
+    this.GRIPPER_COOLDOWN_FRAMES = 60;  // Frames to wait between toggles
 
     // Initial end effector position
     this.INITIAL_EE_POS = [0.162, 0.118];
