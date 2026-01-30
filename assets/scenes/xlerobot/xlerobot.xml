@@ -88,7 +88,10 @@
       <geom type="box" size="0.1575 0.2025 0.295" pos="0 0 0.015" class="collision" friction="1 0.005 0.0001" rgba="0.9 0.3 0.3 0.4"/>
       <geom type="box" size="0.045 0.018 0.34" pos="0 -0.216 0.06" class="collision" friction="1 0.005 0.0001" rgba="0.3 0.9 0.3 0.4"/>
       <geom type="box" size="0.045 0.018 0.34" pos="0 0.216 0.06" class="collision" friction="1 0.005 0.0001" rgba="0.9 0.9 0.3 0.4"/>
-      
+      <geom type="box" size="0.12 0.008 0.05" pos="0.04 0.20 0.34" class="collision" friction="1 0.005 0.0001" rgba="0.9 0.3 0.3 0.5"/>
+      <geom type="box" size="0.12 0.008 0.05" pos="0.04 -0.20 0.34" class="collision" friction="1 0.005 0.0001" rgba="0.9 0.3 0.3 0.5"/>
+      <geom type="box" size="0.008 0.2 0.05" pos="0.155 0.00 0.34" class="collision" friction="1 0.005 0.0001" rgba="0.9 0.3 0.3 0.5"/>
+      <geom type="box" size="0.008 0.2 0.05" pos="-0.055 0.00 0.34" class="collision" friction="1 0.005 0.0001" rgba="0.9 0.3 0.3 0.5"/>
       <!-- Base link inertial properties (mass set to 0, mass moved to wheels) -->
       <inertial pos="0 0 -0.38" mass="10" diaginertia="0.001 0.001 0.001"/>
       
