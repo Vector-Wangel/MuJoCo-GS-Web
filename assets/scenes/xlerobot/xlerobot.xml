@@ -1,4 +1,8 @@
 <mujoco model="xlerobot">
+  <option timestep="0.002" noslip_iterations="3">
+    <flag multiccd="enable"/>
+  </option>
+
   <compiler angle="radian" meshdir="./meshes/"/>
 
   <asset>
@@ -64,7 +68,8 @@
       <geom type="mesh" contype="0" conaffinity="0" density="0" group="2"/>
     </default>
     <default class="collision">
-      <geom contype="1" conaffinity="1" group="3" type="mesh"/>
+      <geom contype="1" conaffinity="1" group="3" type="mesh"
+            condim="4" solref="0.01 1.0" solimp="0.9 0.95 0.001"/>
     </default>
   </default>
 
@@ -169,8 +174,8 @@
                   <geom type="mesh" mesh="Fixed_Jaw" material="white" class="visual"/>
                   <geom type="mesh" mesh="Fixed_Jaw_Motor" material="motor" class="visual"/>
                   <!-- Collision meshes (using convex parts from URDF) with high friction for gripping -->
-                  <geom type="mesh" mesh="Fixed_Jaw_part1" class="collision" friction="2 0.1 0.01"/>
-                  <geom type="mesh" mesh="Fixed_Jaw_part2" class="collision" friction="2 0.1 0.01"/>
+                  <geom type="mesh" mesh="Fixed_Jaw_part1" class="collision" friction="2 0.1 0.01" condim="4"/>
+                  <geom type="mesh" mesh="Fixed_Jaw_part2" class="collision" friction="2 0.1 0.01" condim="4"/>
 
                   <body name="Moving_Jaw" pos="-0.0202 -0.0244 0" euler="3.1416 0 3.33">
                     <inertial pos="-0.00157495 -0.0300244 0.0192755" mass="0.012" fullinertia="6.61427e-06 1.89032e-06 5.28738e-06 -3.19807e-07 -5.90717e-09 -1.09945e-07"/>
@@ -178,9 +183,9 @@
                     <!-- Visual mesh -->
                     <geom type="mesh" mesh="Moving_Jaw" material="white" class="visual"/>
                     <!-- Collision meshes (using convex parts from URDF) with high friction for gripping -->
-                    <geom type="mesh" mesh="Moving_Jaw_part1" class="collision" friction="2 0.1 0.01"/>
-                    <geom type="mesh" mesh="Moving_Jaw_part2" class="collision" friction="2 0.1 0.01"/>
-                    <geom type="mesh" mesh="Moving_Jaw_part3" class="collision" friction="2 0.1 0.01"/>
+                    <geom type="mesh" mesh="Moving_Jaw_part1" class="collision" friction="2 0.1 0.01" condim="4"/>
+                    <geom type="mesh" mesh="Moving_Jaw_part2" class="collision" friction="2 0.1 0.01" condim="4"/>
+                    <geom type="mesh" mesh="Moving_Jaw_part3" class="collision" friction="2 0.1 0.01" condim="4"/>
                   </body>
 
                   <!-- Camera on first arm -->
@@ -252,8 +257,8 @@
                   <geom type="mesh" mesh="Fixed_Jaw" material="white" class="visual"/>
                   <geom type="mesh" mesh="Fixed_Jaw_Motor" material="motor" class="visual"/>
                   <!-- Collision meshes (using convex parts from URDF) with high friction for gripping -->
-                  <geom type="mesh" mesh="Fixed_Jaw_part1" class="collision" friction="2 0.1 0.01"/>
-                  <geom type="mesh" mesh="Fixed_Jaw_part2" class="collision" friction="2 0.1 0.01"/>
+                  <geom type="mesh" mesh="Fixed_Jaw_part1" class="collision" friction="2 0.1 0.01" condim="4"/>
+                  <geom type="mesh" mesh="Fixed_Jaw_part2" class="collision" friction="2 0.1 0.01" condim="4"/>
 
                   <body name="Moving_Jaw_2" pos="-0.0202 -0.0244 0" euler="3.1416 0 3.33">
                     <inertial pos="-0.00157495 -0.0300244 0.0192755" mass="0.012" fullinertia="6.61427e-06 1.89032e-06 5.28738e-06 -3.19807e-07 -5.90717e-09 -1.09945e-07"/>
@@ -261,9 +266,9 @@
                     <!-- Visual mesh -->
                     <geom type="mesh" mesh="Moving_Jaw" material="white" class="visual"/>
                     <!-- Collision meshes (using convex parts from URDF) with high friction for gripping -->
-                    <geom type="mesh" mesh="Moving_Jaw_part1" class="collision" friction="2 0.1 0.01"/>
-                    <geom type="mesh" mesh="Moving_Jaw_part2" class="collision" friction="2 0.1 0.01"/>
-                    <geom type="mesh" mesh="Moving_Jaw_part3" class="collision" friction="2 0.1 0.01"/>
+                    <geom type="mesh" mesh="Moving_Jaw_part1" class="collision" friction="2 0.1 0.01" condim="4"/>
+                    <geom type="mesh" mesh="Moving_Jaw_part2" class="collision" friction="2 0.1 0.01" condim="4"/>
+                    <geom type="mesh" mesh="Moving_Jaw_part3" class="collision" friction="2 0.1 0.01" condim="4"/>
                   </body>
 
                   <!-- Camera on second arm -->
