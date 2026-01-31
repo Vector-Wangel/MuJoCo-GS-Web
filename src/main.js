@@ -386,17 +386,20 @@ class GaussianSplatController {
 
     let target = new THREE.Vector3(0, 0.7, 0);
 
-    // Load splat
-    const splat = new SplatMesh({ url: '${absoluteSpzUrl}' });
-    scene.add(splat);
+    // Wait for splat URL from parent
+    let splat = null;
 
-    // Sync camera with parent
+    // Sync camera and receive config from parent
     window.addEventListener('message', (e) => {
       if (e.data.type === 'camera') {
         camera.position.fromArray(e.data.position);
         camera.quaternion.fromArray(e.data.quaternion);
         target.fromArray(e.data.target);
         camera.updateProjectionMatrix();
+      } else if (e.data.type === 'loadSplat' && !splat) {
+        console.log('Loading splat from:', e.data.url);
+        splat = new SplatMesh({ url: e.data.url });
+        scene.add(splat);
       }
     });
 
@@ -438,6 +441,13 @@ class GaussianSplatController {
         // Timeout fallback
         setTimeout(resolve, 3000);
       });
+
+      // Send the splat URL to the iframe
+      console.log('Sending splat URL to iframe:', absoluteSpzUrl);
+      this.iframe.contentWindow.postMessage({
+        type: 'loadSplat',
+        url: absoluteSpzUrl
+      }, '*');
 
       // Save and clear scene background to show iframe through
       this.savedBackground = this.scene.background;
