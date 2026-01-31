@@ -318,12 +318,14 @@ export class MuJoCoDemo {
     // Sync camera to 3DGS iframe if enabled
     if (this.gsController && this.gsController.enabled) {
       this.gsController.syncCamera(this.camera, this.controls);
-      // 确保透明背景
+      // 绕过后处理，直接渲染以保持透明度
       this.renderer.setClearColor(0x000000, 0);
+      this.renderer.clear();
+      this.renderer.render(this.scene, this.camera);
+    } else {
+      // Render with post-processing
+      this.composer.render();
     }
-
-    // Render with post-processing
-    this.composer.render();
   }
 }
 
