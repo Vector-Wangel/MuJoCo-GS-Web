@@ -39,7 +39,7 @@ export class MuJoCoDemo {
     this.updateGUICallbacks = [];
 
     this.container = document.createElement( 'div' );
-    this.container.style.cssText = 'position: relative; width: 100%; height: 100%; isolation: isolate;';
+    this.container.style.cssText = 'position: relative; width: 100%; height: 100%; z-index: 1;';
     document.body.appendChild( this.container );
 
     this.scene = new THREE.Scene();
@@ -385,8 +385,8 @@ class GaussianSplatController {
       const viewerUrl = new URL('./gs-viewer.html', window.location.href);
       viewerUrl.searchParams.set('splat', absoluteSpzUrl);
 
-      // Insert iframe before the main canvas
-      this.container.insertBefore(this.iframe, this.container.firstChild);
+      // Insert iframe directly in body, before the container
+      document.body.insertBefore(this.iframe, this.container);
 
       // Set iframe source to the viewer HTML file
       this.iframe.src = viewerUrl.href;
