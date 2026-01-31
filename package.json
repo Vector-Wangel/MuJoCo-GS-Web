@@ -26,6 +26,6 @@
   "dependencies": {
     "esbuild": "^0.25.12",
     "mujoco-js": "^0.0.7",
-    "three": "^0.181.0"
+    "three": "^0.178.0"
   }
 }
