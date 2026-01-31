@@ -102,7 +102,7 @@
   </default>
 
   <worldbody>
-    <geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3"/>
+    <geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3" group="3"/>
     <light name="spotlight" mode="targetbodycom" target="torso" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -6 4" cutoff="30"/>
     <body name="torso" pos="0 0 1.282" childclass="body">
       <light name="top" pos="0 0 2" mode="trackcom"/>

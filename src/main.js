@@ -420,10 +420,14 @@ class GaussianSplatController {
         }
       });
 
-      // Ensure canvas is on top with proper z-index
+      // Ensure container and canvas are on top of iframe
+      this.container.style.zIndex = '10';
+      this.container.style.position = 'relative';
+
       const canvas = document.getElementById('mujoco-canvas');
       if (canvas) {
         canvas.style.zIndex = '10';
+        canvas.style.opacity = '0.9';  // Debug: 0.9 opacity
       }
 
       this.enabled = true;
