@@ -47,7 +47,7 @@
   </default>
 
   <asset>
-    <material class="panda" name="white" rgba="0.66 0.66 0.66 1"/>
+    <material class="panda" name="white" rgba="0.64 0.64 0.64 1"/>
     <material class="panda" name="off_white" rgba="0.5 0.5 0.5 1"/>
     <material class="panda" name="black" rgba="0.2 0.2 0.2 1"/>
     <material class="panda" name="green" rgba="0.1 0.5 0.1 1"/>
@@ -281,13 +281,12 @@
     <general class="panda" name="actuator6" joint="joint6" gainprm="2000" biasprm="0 -2000 -200" forcerange="-12 12"
       ctrlrange="-0.0175 3.7525"/>
     <general class="panda" name="actuator7" joint="joint7" gainprm="2000" biasprm="0 -2000 -200" forcerange="-12 12"/>
-    <!-- Gripper actuator with increased force for grasping -->
-    <general class="panda" name="actuator8" tendon="split" forcerange="-200 200" ctrlrange="0 255"
-      gainprm="0.01568627451 0 0" biasprm="0 -200 -20"/>
+    <!-- Gripper actuator: position control with high stiffness -->
+    <position name="actuator8" tendon="split" kp="1000" kv="50" ctrlrange="0 0.04" forcerange="-100 100"/>
   </actuator>
 
   <keyframe>
-    <key name="home" qpos="0 0 0 -1.57079 0 1.57079 -0.7853 0.04 0.04" ctrl="0 0 0 -1.57079 0 1.57079 -0.7853 255"/>
+    <key name="home" qpos="0 0 0 -1.57079 0 1.57079 -0.7853 0.04 0.04" ctrl="0 0 0 -1.57079 0 1.57079 -0.7853 0.04"/>
   </keyframe>
 
   <contact>

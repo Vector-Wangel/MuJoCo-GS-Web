@@ -497,8 +497,8 @@ class PandaController {
     // Joint velocity limits (rad/frame)
     this.MAX_JOINT_VEL = 0.05;
 
-    // Gripper settings (actuator8 has ctrlrange 0-255)
-    this.GRIPPER_OPEN = 255;
+    // Gripper settings (actuator8 has ctrlrange 0-0.04, position control)
+    this.GRIPPER_OPEN = 0.04;
     this.GRIPPER_CLOSED = 0;
 
     // Panda joint indices (7 DOF arm)
