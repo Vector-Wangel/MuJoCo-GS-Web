@@ -39,7 +39,7 @@ export class MuJoCoDemo {
     this.updateGUICallbacks = [];
 
     this.container = document.createElement( 'div' );
-    this.container.style.cssText = 'position: relative; width: 100%; height: 100%;';
+    this.container.style.cssText = 'position: relative; width: 100%; height: 100%; isolation: isolate;';
     document.body.appendChild( this.container );
 
     this.scene = new THREE.Scene();
@@ -74,7 +74,12 @@ export class MuJoCoDemo {
     targetObject.position.set(0, 1, 0);
     this.scene.add( this.spotlight );
 
-    this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true, premultipliedAlpha: false } );
+    this.renderer = new THREE.WebGLRenderer( {
+      antialias: true,
+      alpha: true,
+      premultipliedAlpha: false,
+      preserveDrawingBuffer: true
+    } );
     this.renderer.setPixelRatio(1.0);////window.devicePixelRatio );
     this.renderer.setSize( window.innerWidth, window.innerHeight );
     this.renderer.shadowMap.enabled = true;
@@ -89,12 +94,15 @@ export class MuJoCoDemo {
     this.renderer.setAnimationLoop( this.render.bind(this) );
 
     // Position canvas absolutely so it can layer above GS iframe
+    // Will be modified when GS is enabled to use blend mode
     this.renderer.domElement.style.cssText = `
       position: absolute;
       top: 0;
       left: 0;
       z-index: 1;
+      background: transparent;
     `;
+    this.renderer.domElement.id = 'mujoco-canvas';
     this.container.appendChild( this.renderer.domElement );
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -359,6 +367,7 @@ class GaussianSplatController {
       console.log('Loading splat from:', absoluteSpzUrl);
 
       // Create iframe for isolated 3DGS rendering
+      // GS goes behind, MuJoCo canvas must be transparent
       this.iframe = document.createElement('iframe');
       this.iframe.style.cssText = `
         position: absolute;
@@ -410,6 +419,12 @@ class GaussianSplatController {
           console.log('Hidden mesh for GS:', obj.name);
         }
       });
+
+      // Apply blend mode to canvas for proper compositing
+      const canvas = document.getElementById('mujoco-canvas');
+      if (canvas) {
+        canvas.style.mixBlendMode = 'lighten';
+      }
 
       this.enabled = true;
       console.log('3D Gaussian Splatting environment enabled');
@@ -464,6 +479,12 @@ class GaussianSplatController {
         mesh.visible = true;
       });
       this.hiddenMeshes = null;
+    }
+
+    // Remove blend mode from canvas
+    const canvas = document.getElementById('mujoco-canvas');
+    if (canvas) {
+      canvas.style.mixBlendMode = 'normal';
     }
 
     this.enabled = false;
