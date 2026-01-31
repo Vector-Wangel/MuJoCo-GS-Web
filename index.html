@@ -27,7 +27,11 @@
 
         <!-- Allows three.js Examples to work without building -->
         <script type="importmap">
-            { "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/"} }
+            { "imports": {
+                "three": "./node_modules/three/build/three.module.js",
+                "three/addons/": "./node_modules/three/examples/jsm/",
+                "@sparkjsdev/spark": "./node_modules/@sparkjsdev/spark/dist/spark.module.js"
+            } }
         </script>
 
         <div id="appbody" style="position: absolute;">

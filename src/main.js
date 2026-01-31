@@ -369,9 +369,10 @@ class GaussianSplatController {
       console.log('Loading splat from:', absoluteSpzUrl);
 
       // Dynamically import Spark module (cached after first load)
+      // Uses local npm package via importmap to ensure same Three.js instance
       if (!this.SparkModule) {
         console.log('Importing Spark module...');
-        this.SparkModule = await import('https://sparkjs.dev/releases/spark/0.1.10/spark.module.js');
+        this.SparkModule = await import('@sparkjsdev/spark');
         console.log('Spark module loaded');
       }
 
