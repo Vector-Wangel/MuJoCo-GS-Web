@@ -1,9 +1,8 @@
 <p align="center">
 
   <a href="https://vector-wangel.github.io/XLeRobot-Web/"><img src="https://github.com/user-attachments/assets/f6880e23-efad-4590-8feb-bbeaf18616b6" href></a>
+  <a href="https://vector-wangel.github.io/XLeRobot-Web/"><img src="https://github.com/user-attachments/assets/9f6faa1c-6f4e-40ea-a28d-795b0f3323d2" href></a>
 </p>
-
-
 
 
 ## Run XLeRobot in MuJoCo in your Browser.
@@ -57,6 +56,7 @@ mujoco.mj_applyFT(model, data, [fx, fy, fz], [tx, ty, tz], [px, py, pz], bodyId,
 data.delete();
 model.delete();
 ```
+
 
 
 
