@@ -345,7 +345,7 @@ class GaussianSplatController {
       `;
 
       // Create the iframe content with Spark.js viewer
-      // Use esm.sh which pre-bundles dependencies and handles bare specifiers
+      // Use es-module-shims to enable importmap in blob URL context
       const iframeContent = `
 <!DOCTYPE html>
 <html>
@@ -355,11 +355,19 @@ class GaussianSplatController {
     body { overflow: hidden; background: transparent; }
     canvas { display: block; }
   </style>
+  <script async src="https://ga.jspm.io/npm:es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/": "https://cdn.jsdelivr.net/npm/three@0.169.0/"
+    }
+  }
+  </script>
 </head>
 <body>
   <script type="module">
-    import * as THREE from 'https://esm.sh/three@0.169.0';
-    import { OrbitControls } from 'https://esm.sh/three@0.169.0/examples/jsm/controls/OrbitControls.js';
+    import * as THREE from 'three';
     import { SplatMesh } from 'https://sparkjs.dev/releases/spark/0.1.10/spark.module.js';
 
     const scene = new THREE.Scene();
@@ -371,11 +379,7 @@ class GaussianSplatController {
     renderer.setClearColor(0x000000, 0);
     document.body.appendChild(renderer.domElement);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 0.7, 0);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.10;
-    controls.update();
+    let target = new THREE.Vector3(0, 0.7, 0);
 
     // Load splat
     const splat = new SplatMesh({ url: '${spzUrl}' });
@@ -386,7 +390,7 @@ class GaussianSplatController {
       if (e.data.type === 'camera') {
         camera.position.fromArray(e.data.position);
         camera.quaternion.fromArray(e.data.quaternion);
-        controls.target.fromArray(e.data.target);
+        target.fromArray(e.data.target);
         camera.updateProjectionMatrix();
       }
     });
@@ -394,7 +398,6 @@ class GaussianSplatController {
     // Animation loop
     function animate() {
       requestAnimationFrame(animate);
-      controls.update();
       renderer.render(scene, camera);
     }
     animate();
