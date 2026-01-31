@@ -117,7 +117,7 @@
 
   <worldbody>
     <light name="top" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -6 4" mode="trackcom"/>
-    <body name="link0" childclass="panda" pos="0 0 0.8">
+    <body name="link0" childclass="panda" pos="0 0 0.8" euler="0 0 1.5708">
       <inertial mass="0.629769" pos="-0.041018 -0.00014 0.049974"
         fullinertia="0.00315 0.00388 0.004285 8.2904e-7 0.00015 8.2299e-6"/>
       <geom mesh="link0_0" material="off_white" class="visual"/>

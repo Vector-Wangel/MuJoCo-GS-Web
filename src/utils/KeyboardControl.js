@@ -509,9 +509,9 @@ class PandaController {
     this.JOINT_LIMITS_MIN = [-2.8973, -1.7628, -2.8973, -3.0718, -2.8973, -0.0175, -2.8973];
     this.JOINT_LIMITS_MAX = [2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3.7525, 2.8973];
 
-    // Workspace limits
-    this.POS_MIN = [0.2, -0.5, 0.02];
-    this.POS_MAX = [0.8, 0.5, 0.8];
+    // Workspace limits (Panda raised by 0.8m)
+    this.POS_MIN = [-0.8, -0.8, 0.82];
+    this.POS_MAX = [0.8, 0.8, 1.6];
 
     // State
     this.state = null;
