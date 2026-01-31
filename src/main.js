@@ -303,3 +303,120 @@ export class MuJoCoDemo {
 
 let demo = new MuJoCoDemo();
 await demo.init();
+
+// ============================================================================
+// Gaussian Splatting Environment Controller (Lazy Loading)
+// ============================================================================
+
+class GaussianSplatController {
+  constructor(scene) {
+    this.scene = scene;
+    this.splatMesh = null;
+    this.SparkModule = null;
+    this.enabled = false;
+    this.loading = false;
+  }
+
+  async enable(spzUrl = './assets/scene.spz') {
+    if (this.enabled || this.loading) return;
+    this.loading = true;
+
+    try {
+      // Dynamic import Spark (first time only)
+      if (!this.SparkModule) {
+        this.SparkModule = await import('https://sparkjs.dev/releases/spark/0.1.10/spark.module.js');
+      }
+
+      // Create SplatMesh (this fetches the SPZ file)
+      const { SplatMesh } = this.SparkModule;
+      this.splatMesh = new SplatMesh({ url: spzUrl });
+
+      // Adjust position/rotation/scale as needed
+      this.splatMesh.position.set(0, 0, 0);
+      // this.splatMesh.rotation.set(0, Math.PI, 0);
+      // this.splatMesh.scale.setScalar(1.0);
+
+      this.scene.add(this.splatMesh);
+      this.enabled = true;
+      console.log('3D Gaussian Splatting environment enabled');
+    } catch (err) {
+      console.error('Failed to load 3DGS:', err);
+    }
+
+    this.loading = false;
+  }
+
+  disable() {
+    if (!this.enabled || !this.splatMesh) return;
+
+    this.scene.remove(this.splatMesh);
+    if (this.splatMesh.dispose) {
+      this.splatMesh.dispose();
+    }
+    this.splatMesh = null;
+    this.enabled = false;
+    console.log('3D Gaussian Splatting environment disabled');
+  }
+
+  async toggle(spzUrl) {
+    if (this.enabled) {
+      this.disable();
+    } else {
+      await this.enable(spzUrl);
+    }
+    return this.enabled;
+  }
+
+  isLoading() {
+    return this.loading;
+  }
+}
+
+// Create controller and UI button
+const gsController = new GaussianSplatController(demo.scene);
+
+const gsToggleBtn = document.createElement('button');
+gsToggleBtn.textContent = '🌍 Enable 3D Environment';
+gsToggleBtn.style.cssText = `
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+`;
+
+gsToggleBtn.onmouseenter = () => {
+  gsToggleBtn.style.transform = 'scale(1.05)';
+  gsToggleBtn.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
+};
+
+gsToggleBtn.onmouseleave = () => {
+  gsToggleBtn.style.transform = 'scale(1)';
+  gsToggleBtn.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+};
+
+gsToggleBtn.onclick = async () => {
+  gsToggleBtn.disabled = true;
+  gsToggleBtn.style.cursor = 'wait';
+  gsToggleBtn.textContent = '⏳ Loading...';
+
+  const enabled = await gsController.toggle('./assets/scene.spz');
+
+  gsToggleBtn.textContent = enabled ? '🌍 Disable 3D Environment' : '🌍 Enable 3D Environment';
+  gsToggleBtn.style.background = enabled
+    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+    : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)';
+  gsToggleBtn.disabled = false;
+  gsToggleBtn.style.cursor = 'pointer';
+};
+
+document.body.appendChild(gsToggleBtn);
