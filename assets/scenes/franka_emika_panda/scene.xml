@@ -28,30 +28,30 @@
     </body>
     <body name="table1" pos="1.35 0.02 0.41">
       <geom type="box" size="0.35 0.88 0.41" rgba="0.6 0.4 0.2 0.1" mass="0.1"
-            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4"/>
+            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4" group="3"/>
     </body>
     <body name="table2" pos="0 -0.58 0.41">
       <geom type="box" size="1 0.28 0.41" rgba="0.6 0.4 0.2 0.1" mass="0.1"
-            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4"/>
+            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4" group="3"/>
     </body>
     <body name="table3" pos="-1.35 0.02 0.41">
       <geom type="box" size="0.35 0.88 0.41" rgba="0.6 0.4 0.2 0.1" mass="0.1"
-            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4"/>
+            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4" group="3"/>
     </body>
     <body name="wall1" pos="1.8 0.1 1.2">
       <geom type="box" size="0.1 1 1.2" rgba="0.5 0.5 0.5 0.1" mass="0.1"
-            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4"/>
+            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4" group="3"/>
     </body>
     <body name="wall2" pos="0 -0.96 1.2">
       <geom type="box" size="1.7 0.1 1.2" rgba="0.5 0.5 0.5 0.1" mass="0.1"
-            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4"/>
+            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4" group="3"/>
     </body>
     <body name="wall3" pos="-1.8 0.1 1.2">
       <geom type="box" size="0.1 1 1.2" rgba="0.5 0.5 0.5 0.1" mass="0.1"
-            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4"/>
+            contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4" group="3"/>
     </body>
     <body name="bbox" pos="0 0 0.4">
-      <geom type="box" size="0.1 0.15 0.4" rgba="0.5 0.5 0.5 0.9" mass="0.1"
+      <geom type="box" size="0.1 0.15 0.4" rgba="0.2 0.2 0.2 1" mass="0.1"
             contype="1" conaffinity="1" friction="1.0 0.05 0.01" condim="4"/>
     </body>
   </worldbody>
