@@ -423,7 +423,8 @@ class GaussianSplatController {
       // Make MuJoCo canvas semi-transparent to show GS behind
       const canvas = document.getElementById('mujoco-canvas');
       if (canvas) {
-        canvas.style.opacity = '0.7';
+        canvas.style.opacity = '0.3';
+        console.log('Canvas opacity set to 0.3');
       }
 
       this.enabled = true;
