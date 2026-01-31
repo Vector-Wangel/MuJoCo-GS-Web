@@ -117,11 +117,23 @@ export class MuJoCoDemo {
 
   // ===== 新增：Toon 渲染设置方法 =====
   setupToonRendering() {
-    // 创建后处理管线
-    this.composer = new EffectComposer(this.renderer);
+    // 创建支持 alpha 的渲染目标
+    const renderTarget = new THREE.WebGLRenderTarget(
+      window.innerWidth,
+      window.innerHeight,
+      {
+        format: THREE.RGBAFormat,
+        type: THREE.HalfFloatType,
+        stencilBuffer: false,
+      }
+    );
+
+    // 创建后处理管线（使用支持 alpha 的渲染目标）
+    this.composer = new EffectComposer(this.renderer, renderTarget);
 
     // 基础渲染 Pass
     const renderPass = new RenderPass(this.scene, this.camera);
+    renderPass.clearAlpha = 0;  // 透明背景
     this.composer.addPass(renderPass);
 
     // 描边 Shader
@@ -306,6 +318,8 @@ export class MuJoCoDemo {
     // Sync camera to 3DGS iframe if enabled
     if (this.gsController && this.gsController.enabled) {
       this.gsController.syncCamera(this.camera, this.controls);
+      // 确保透明背景
+      this.renderer.setClearColor(0x000000, 0);
     }
 
     // Render with post-processing
