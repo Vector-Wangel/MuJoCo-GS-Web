@@ -10,6 +10,7 @@
 Load and Run MuJoCo 3.3.8 Models using JavaScript and the official MuJoCo WebAssembly Bindings.
 
 ### [See the Live Demo Here](https://vector-wangel.github.io/XLeRobot-Web/)
+<img width="1271" height="975" alt="image" src="https://github.com/user-attachments/assets/e79e8659-d663-4157-ab38-abd24dde9151" />
 
 
 ## JavaScript API
@@ -55,6 +56,7 @@ mujoco.mj_applyFT(model, data, [fx, fy, fz], [tx, ty, tz], [px, py, pz], bodyId,
 data.delete();
 model.delete();
 ```
+
 
 
 
