@@ -367,17 +367,18 @@ class GaussianSplatController {
       console.log('Loading splat from:', absoluteSpzUrl);
 
       // Create iframe for isolated 3DGS rendering
-      // GS behind, MuJoCo canvas on top with opacity for testing
+      // DEBUG: Put iframe on top to verify it's rendering
       this.iframe = document.createElement('iframe');
       this.iframe.style.cssText = `
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         border: none;
         pointer-events: none;
-        z-index: 0;
+        z-index: 9999;
+        opacity: 0.5;
       `;
 
       // Use separate HTML file to avoid blob URL import issues
@@ -385,8 +386,8 @@ class GaussianSplatController {
       const viewerUrl = new URL('./gs-viewer.html', window.location.href);
       viewerUrl.searchParams.set('splat', absoluteSpzUrl);
 
-      // Insert iframe directly in body, before the container
-      document.body.insertBefore(this.iframe, this.container);
+      // Insert iframe at end of body
+      document.body.appendChild(this.iframe);
 
       // Set iframe source to the viewer HTML file
       this.iframe.src = viewerUrl.href;
