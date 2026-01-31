@@ -367,7 +367,7 @@ class GaussianSplatController {
       console.log('Loading splat from:', absoluteSpzUrl);
 
       // Create iframe for isolated 3DGS rendering
-      // DEBUG: Put iframe on top to verify it's rendering
+      // GS behind the MuJoCo canvas
       this.iframe = document.createElement('iframe');
       this.iframe.style.cssText = `
         position: fixed;
@@ -377,8 +377,7 @@ class GaussianSplatController {
         height: 100vh;
         border: none;
         pointer-events: none;
-        z-index: 9999;
-        opacity: 0.5;
+        z-index: 0;
       `;
 
       // Use separate HTML file to avoid blob URL import issues
@@ -386,8 +385,8 @@ class GaussianSplatController {
       const viewerUrl = new URL('./gs-viewer.html', window.location.href);
       viewerUrl.searchParams.set('splat', absoluteSpzUrl);
 
-      // Insert iframe at end of body
-      document.body.appendChild(this.iframe);
+      // Insert iframe at start of body (behind everything)
+      document.body.insertBefore(this.iframe, document.body.firstChild);
 
       // Set iframe source to the viewer HTML file
       this.iframe.src = viewerUrl.href;
@@ -421,11 +420,10 @@ class GaussianSplatController {
         }
       });
 
-      // Make MuJoCo canvas semi-transparent to show GS behind
+      // Ensure canvas is on top with proper z-index
       const canvas = document.getElementById('mujoco-canvas');
       if (canvas) {
-        canvas.style.opacity = '0.3';
-        console.log('Canvas opacity set to 0.3');
+        canvas.style.zIndex = '10';
       }
 
       this.enabled = true;
@@ -483,10 +481,10 @@ class GaussianSplatController {
       this.hiddenMeshes = null;
     }
 
-    // Restore canvas opacity
+    // Restore canvas z-index
     const canvas = document.getElementById('mujoco-canvas');
     if (canvas) {
-      canvas.style.opacity = '1';
+      canvas.style.zIndex = '1';
     }
 
     this.enabled = false;
