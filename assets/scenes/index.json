@@ -120,5 +120,7 @@
   "xlerobot\\meshes\\XLeRobot_camera1.stl",
   "xlerobot\\meshes\\XLeRobot_camera2.stl",
   "xlerobot\\scene.xml",
+  "xlerobot\\scene_arm.xml",
+  "xlerobot\\SO101.xml",
   "xlerobot\\xlerobot.xml"
 ]
