@@ -1,7 +1,7 @@
 <mujoco model="panda">
   <compiler angle="radian" meshdir="assets" autolimits="true"/>
 
-  <option integrator="implicitfast"/>
+  <option integrator="implicitfast" noslip_iterations="3"/>
 
   <default>
     <default class="panda">
@@ -9,7 +9,7 @@
       <joint armature="0.1" damping="1" axis="0 0 1" range="-2.8973 2.8973"/>
       <general dyntype="none" biastype="affine" ctrlrange="-2.8973 2.8973" forcerange="-87 87"/>
       <default class="finger">
-        <joint axis="0 1 0" type="slide" range="0 0.04" damping="50" armature="0.01"/>
+        <joint axis="0 1 0" type="slide" range="0 0.04" damping="5" armature="0.01"/>
       </default>
 
       <default class="visual">
@@ -283,7 +283,7 @@
       ctrlrange="-0.0175 3.7525"/>
     <general class="panda" name="actuator7" joint="joint7" gainprm="2000" biasprm="0 -2000 -200" forcerange="-12 12"/>
     <!-- Gripper actuator: position control with high stiffness -->
-    <position name="actuator8" tendon="split" kp="1000" kv="50" ctrlrange="0 0.04" forcerange="-100 100"/>
+    <position name="actuator8" tendon="split" kp="1000" kv="10" ctrlrange="0 0.04" forcerange="-100 100"/>
   </actuator>
 
   <keyframe>
