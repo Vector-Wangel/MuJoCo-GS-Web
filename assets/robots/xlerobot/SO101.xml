@@ -1,5 +1,5 @@
 <mujoco model="SO101">
-  <compiler angle="radian" meshdir="./meshes/"/>
+  <compiler angle="radian" meshdir="./assets/"/>
 
   <option integrator="implicitfast" noslip_iterations="3"/>
 

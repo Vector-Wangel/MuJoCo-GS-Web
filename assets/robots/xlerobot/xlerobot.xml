@@ -3,7 +3,7 @@
     <flag multiccd="enable"/>
   </option> -->
 
-  <compiler angle="radian" meshdir="./meshes/"/>
+  <compiler angle="radian" meshdir="./assets/"/>
 
   <asset>
     <material name="white" rgba="0.3 0.3 0.3 1" specular="0.1" shininess="0.1"/>

@@ -17,28 +17,28 @@ export class SceneManager {
       xmlPath: './assets/robots/xlerobot/xlerobot.xml',
       objectsPath: './assets/robots/xlerobot/objects.xml',
       robotDir: 'xlerobot',
-      meshDir: 'meshes',
+      meshDir: 'assets',
       description: 'XLeRobot Dual-Arm Mobile Robot'
     },
     'SO101': {
       xmlPath: './assets/robots/xlerobot/SO101.xml',
       objectsPath: './assets/robots/xlerobot/objects_SO101.xml',
-      robotDir: 'xlerobot',  // shares meshes with xlerobot
-      meshDir: 'meshes',
+      robotDir: 'xlerobot',  // shares assets with xlerobot
+      meshDir: 'assets',
       description: 'SO101 Single Arm'
     },
     'panda': {
       xmlPath: './assets/robots/panda/panda.xml',
       objectsPath: './assets/robots/panda/objects.xml',
       robotDir: 'panda',
-      meshDir: 'meshes',
+      meshDir: 'assets',
       description: 'Franka Emika Panda'
     },
     'humanoid': {
       xmlPath: './assets/robots/humanoid/humanoid.xml',
       objectsPath: null,  // humanoid has no objects
       robotDir: 'humanoid',
-      meshDir: null,  // humanoid uses primitive shapes, no meshes
+      meshDir: null,  // humanoid uses primitive shapes, no assets
       description: 'DeepMind Humanoid'
     }
   };
@@ -88,7 +88,7 @@ export class SceneManager {
       this._ensureDir('/working/scenes');
       this._ensureDir(vfsSceneDir);
       if (robotConfig.meshDir) {
-        this._ensureDir(`${vfsSceneDir}/meshes`);
+        this._ensureDir(`${vfsSceneDir}/assets`);
       }
 
       // 2. Copy robot XML to scene directory (so include can find it)
@@ -102,7 +102,7 @@ export class SceneManager {
       if (robotConfig.meshDir) {
         robotXml = robotXml.replace(
           /meshdir="[^"]*"/g,
-          `meshdir="./meshes/"`
+          `meshdir="./assets/"`
         );
       }
       this._writeToFS(`${vfsSceneDir}/${robotName}.xml`, robotXml);
@@ -122,11 +122,11 @@ export class SceneManager {
         }
       }
 
-      // 4. Copy mesh files from /working/robots/{robotDir}/meshes/ to scene directory
-      // (meshes were already downloaded by downloadExampleScenesFolder)
+      // 4. Copy asset files from /working/robots/{robotDir}/assets/ to scene directory
+      // (assets were already downloaded by downloadExampleScenesFolder)
       if (robotConfig.meshDir) {
-        const srcMeshDir = `/working/robots/${robotDir}/meshes`;
-        const dstMeshDir = `${vfsSceneDir}/meshes`;
+        const srcMeshDir = `/working/robots/${robotDir}/assets`;
+        const dstMeshDir = `${vfsSceneDir}/assets`;
 
         try {
           const meshFiles = this.mujoco.FS.readdir(srcMeshDir);
@@ -278,18 +278,18 @@ export class SceneManager {
     // Create directories
     this._ensureDir('/working/scenes');
     this._ensureDir(vfsSceneDir);
-    this._ensureDir(`${vfsSceneDir}/meshes`);
+    this._ensureDir(`${vfsSceneDir}/assets`);
 
-    // Write mesh files
+    // Write asset files
     for (const [name, buffer] of meshFiles) {
-      const meshPath = `${vfsSceneDir}/meshes/${name}`;
+      const meshPath = `${vfsSceneDir}/assets/${name}`;
       this.mujoco.FS.writeFile(meshPath, new Uint8Array(buffer));
     }
 
     // Fix meshdir and write robot XML
     let fixedRobotXml = robotXml.replace(
       /meshdir="[^"]*"/g,
-      `meshdir="./meshes/"`
+      `meshdir="./assets/"`
     );
     this._writeToFS(`${vfsSceneDir}/robot.xml`, fixedRobotXml);
 

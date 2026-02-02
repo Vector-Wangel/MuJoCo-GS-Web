@@ -87,10 +87,10 @@ export class RobotLoader {
           // First non-object XML is the main robot XML
           robotXml = content;
         }
-      } else if (path.includes('meshes/') || path.includes('mesh/')) {
-        // Store mesh files
+      } else if (path.includes('assets/') || path.includes('meshes/') || path.includes('mesh/')) {
+        // Store mesh/asset files
         const buffer = await file.arrayBuffer();
-        const meshName = path.split(/meshes?\//).pop();
+        const meshName = path.split(/(?:assets|meshes?)\//).pop();
         meshFiles.set(meshName, buffer);
       }
     }
