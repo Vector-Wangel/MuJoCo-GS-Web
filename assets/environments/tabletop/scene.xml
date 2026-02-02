@@ -3,7 +3,7 @@
   <statistic center="0 0 1.0" extent="2.0"/>
 
   <visual>
-    <headlight diffuse="0.1 0.1 0.1" ambient="0.1 0.1 0.1" specular="0 0 0"/>
+    <headlight diffuse="0.01 0.01 0.01" ambient="0.01 0.01 0.01" specular="0 0 0"/>
     <rgba haze="0.15 0.25 0.35 1"/>
     <global azimuth="150" elevation="-20"/>
   </visual>
@@ -20,7 +20,7 @@
   </default>
 
   <worldbody>
-    <light pos="1 0 2.5" dir="-1 0 -1" directional="true" diffuse="0.15 0.15 0.15" specular="0 0 0"/>
+    <light pos="1 0 2.5" dir="-1 0 -1" directional="true" diffuse="0.1 0.1 0.1" specular="0 0 0"/>
 
     <!-- Floor with lower friction for easier movement -->
     <geom name="floor" size="0 0 0.05" type="plane" material="grid" contype="1" conaffinity="1" group="3" friction="0.5 0.02 0.01"/>
