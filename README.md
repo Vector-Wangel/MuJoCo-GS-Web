@@ -129,6 +129,9 @@ data.delete();
 model.delete();
 ```
 
+## 🙏 Acknowledgements
+
+This project is built based on [mujoco-wasm](https://github.com/zalo/mujoco_wasm) and [sparkjs](https://sparkjs.dev/).
 
 
 
