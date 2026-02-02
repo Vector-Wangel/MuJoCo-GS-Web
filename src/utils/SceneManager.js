@@ -120,6 +120,9 @@ export class SceneManager {
       const compilerMatch = mergedXml.match(/<compiler[^>]*>/);
       console.log('Merged XML compiler tag:', compilerMatch ? compilerMatch[0] : 'No compiler found');
 
+      // Debug: output first 2000 chars of merged XML
+      console.log('Merged XML preview (first 2000 chars):', mergedXml.substring(0, 2000));
+
       // 6. Set model name
       const sceneName = `${envName}_${robotName}`;
       mergedXml = MujocoXmlMerger.setModelName(mergedXml, sceneName);

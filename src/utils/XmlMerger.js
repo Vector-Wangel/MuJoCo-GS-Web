@@ -61,6 +61,12 @@ export class MujocoXmlMerger {
 
     // Clean up XML declaration if duplicated
     result = result.replace(/(<\?xml[^?]*\?>)/g, '');
+
+    // Remove xmlns attributes that DOMParser/XMLSerializer might add
+    // MuJoCo doesn't understand these and will fail to parse
+    result = result.replace(/\s+xmlns="[^"]*"/g, '');
+    result = result.replace(/\s+xmlns:[a-z]+="[^"]*"/g, '');
+
     result = '<?xml version="1.0" encoding="UTF-8"?>\n' + result.trim();
 
     return result;
