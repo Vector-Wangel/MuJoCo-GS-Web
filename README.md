@@ -41,9 +41,13 @@ Load and Run MuJoCo 3.3.8 Models using JavaScript and the official MuJoCo WebAss
   
 <img width="1944" height="1149" alt="06d77cabe9060f3cfa65d8fbbe9fd875" src="https://github.com/user-attachments/assets/e3423ffd-12c9-4822-a0fe-fb143faff37e" />
 
+Easiest way to find collision boxes' coordinate: adding boxes in [the studio in Marble](https://marble.worldlabs.ai/projects) and read
+
+<img width="2220" height="837" alt="image" src="https://github.com/user-attachments/assets/55ad2873-8e1a-4eef-9c84-2df4e2b82951" />
 
 
-### 🤖 Supported Robots
+
+### 🤖 Supported Robots (& keyboard control)
 
 #### **XLeRobot** - Dual-Arm Mobile Manipulator
 - **DOF**: 2 (base) + 10 (dual 5-DOF arms) + 2 (grippers) + 2 (head)
@@ -88,6 +92,10 @@ Load and Run MuJoCo 3.3.8 Models using JavaScript and the official MuJoCo WebAss
 - **Control Method**: Joint-level PD control
 - **Interaction**: Mouse drag support for direct manipulation
 
+## TODO
+
+- Uploading custom collision.xml for custom spz
+- Add simple RL policy deployment (humanoid/dog walking/running, arms/mobile robot picking)
 
 ## JavaScript API
 
@@ -136,6 +144,7 @@ model.delete();
 ## 🙏 Acknowledgements
 
 This project is built based on [mujoco-wasm](https://github.com/zalo/mujoco_wasm) and [sparkjs](https://sparkjs.dev/).
+
 
 
 
