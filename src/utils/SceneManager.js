@@ -1,17 +1,16 @@
 /**
  * Scene Manager
  *
- * Manages loading of modular scenes (environment + robot + objects).
- * Provides both legacy scene loading and new modular loading support.
+ * Manages loading of modular scenes using MuJoCo's include mechanism.
+ * Scene files use <include file="robot.xml"/> to include robot definitions.
  */
 
-import { MujocoXmlMerger } from './XmlMerger.js';
 import { RobotLoader, SceneConfigManager } from './RobotLoader.js';
 
 export class SceneManager {
   /**
    * Robot configurations - centralized robot metadata
-   * All robots are now in assets/robots/{robotDir}/
+   * All robots are in assets/robots/{robotDir}/
    */
   static ROBOT_CONFIGS = {
     'xlerobot': {
@@ -62,12 +61,12 @@ export class SceneManager {
     this.configManager = new SceneConfigManager();
     this.currentEnv = null;
     this.currentRobot = null;
-    this.mergedScenePath = null;
+    this.scenePath = null;
   }
 
   /**
-   * Load a scene using the modular approach (env + robot + objects)
-   * Falls back to legacy loading if modular files don't exist.
+   * Load a scene using MuJoCo's include mechanism.
+   * Creates a scene XML that uses <include> to bring in robot and objects.
    *
    * @param {string} envName - Environment name (e.g., 'tabletop')
    * @param {string} robotName - Robot name (e.g., 'xlerobot', 'SO101')
@@ -77,112 +76,163 @@ export class SceneManager {
     console.log(`Loading modular scene: env=${envName}, robot=${robotName}`);
 
     try {
-      // 1. Load environment XML
-      const envPath = `./assets/environments/${envName}/scene.xml`;
-      const envResponse = await fetch(envPath);
-      if (!envResponse.ok) {
-        throw new Error(`Environment not found: ${envPath}`);
+      const robotConfig = SceneManager.ROBOT_CONFIGS[robotName];
+      if (!robotConfig) {
+        throw new Error(`Unknown robot: ${robotName}`);
       }
-      const envXml = await envResponse.text();
 
-      // 2. Load robot XML
-      const robotXmlPath = this._getRobotXmlPath(robotName);
-      const robotResponse = await fetch(robotXmlPath);
-      if (!robotResponse.ok) {
-        throw new Error(`Robot not found: ${robotXmlPath}`);
+      const robotDir = robotConfig.robotDir;
+      const vfsSceneDir = `/working/scenes/${robotName}`;
+
+      // 1. Ensure scene directory exists in VFS
+      this._ensureDir('/working/scenes');
+      this._ensureDir(vfsSceneDir);
+      if (robotConfig.meshDir) {
+        this._ensureDir(`${vfsSceneDir}/meshes`);
       }
-      const robotXml = await robotResponse.text();
 
-      // 3. Load objects XML (optional)
-      const objectsXmlPath = this._getObjectsXmlPath(robotName);
-      let objectsXml = null;
-      if (objectsXmlPath) {
+      // 2. Copy robot XML to scene directory (so include can find it)
+      const robotXmlResponse = await fetch(robotConfig.xmlPath);
+      if (!robotXmlResponse.ok) {
+        throw new Error(`Robot XML not found: ${robotConfig.xmlPath}`);
+      }
+      let robotXml = await robotXmlResponse.text();
+
+      // Fix meshdir to be relative to scene directory
+      if (robotConfig.meshDir) {
+        robotXml = robotXml.replace(
+          /meshdir="[^"]*"/g,
+          `meshdir="./meshes/"`
+        );
+      }
+      this._writeToFS(`${vfsSceneDir}/${robotName}.xml`, robotXml);
+
+      // 3. Copy objects XML if exists
+      let hasObjects = false;
+      if (robotConfig.objectsPath) {
         try {
-          const objectsResponse = await fetch(objectsXmlPath);
+          const objectsResponse = await fetch(robotConfig.objectsPath);
           if (objectsResponse.ok) {
-            objectsXml = await objectsResponse.text();
+            const objectsXml = await objectsResponse.text();
+            this._writeToFS(`${vfsSceneDir}/objects.xml`, objectsXml);
+            hasObjects = true;
           }
         } catch (e) {
-          // Objects file is optional
+          console.log('No objects file for robot:', robotName);
         }
       }
 
-      // 4. Merge XMLs
-      let mergedXml = MujocoXmlMerger.merge(envXml, robotXml, objectsXml);
+      // 4. Copy mesh files from /working/robots/{robotDir}/meshes/ to scene directory
+      // (meshes were already downloaded by downloadExampleScenesFolder)
+      if (robotConfig.meshDir) {
+        const srcMeshDir = `/working/robots/${robotDir}/meshes`;
+        const dstMeshDir = `${vfsSceneDir}/meshes`;
 
-      // 5. Fix mesh paths - meshdir needs to point to the robot folder in VFS
-      // Robot files are downloaded to /working/robots/{robotDir}/
-      const robotDir = this._getRobotDir(robotName);
-      console.log(`Fixing mesh paths for robot: ${robotName}, robotDir: ${robotDir}`);
-      mergedXml = MujocoXmlMerger.fixMeshPaths(mergedXml, `/working/robots/${robotDir}`);
+        try {
+          const meshFiles = this.mujoco.FS.readdir(srcMeshDir);
+          console.log(`Copying ${meshFiles.length - 2} mesh files to ${dstMeshDir}`);
+          for (const file of meshFiles) {
+            if (file === '.' || file === '..') continue;
+            const srcPath = `${srcMeshDir}/${file}`;
+            const dstPath = `${dstMeshDir}/${file}`;
+            try {
+              const content = this.mujoco.FS.readFile(srcPath);
+              this.mujoco.FS.writeFile(dstPath, content);
+            } catch (e) {
+              console.error(`Failed to copy mesh ${file}:`, e);
+            }
+          }
+        } catch (e) {
+          console.error('Failed to read mesh directory:', e);
+        }
+      }
 
-      // Debug: log the compiler tag after fixing
-      const compilerMatch = mergedXml.match(/<compiler[^>]*>/);
-      console.log('Merged XML compiler tag:', compilerMatch ? compilerMatch[0] : 'No compiler found');
+      // 5. Load environment XML template
+      const envConfig = SceneManager.ENV_CONFIGS[envName];
+      if (!envConfig) {
+        throw new Error(`Unknown environment: ${envName}`);
+      }
 
-      // Debug: output first 2000 chars of merged XML
-      console.log('Merged XML preview (first 2000 chars):', mergedXml.substring(0, 2000));
+      const envResponse = await fetch(envConfig.xmlPath);
+      if (!envResponse.ok) {
+        throw new Error(`Environment XML not found: ${envConfig.xmlPath}`);
+      }
+      const envXml = await envResponse.text();
 
-      // 6. Set model name
+      // 6. Create scene XML with include
       const sceneName = `${envName}_${robotName}`;
-      mergedXml = MujocoXmlMerger.setModelName(mergedXml, sceneName);
+      const sceneXml = this._createSceneXml(envXml, robotName, hasObjects, sceneName);
 
-      // 7. Write merged XML to virtual filesystem
-      const mergedPath = `/working/merged_${sceneName}.xml`;
-      this._writeToFS(mergedPath, mergedXml);
+      // Debug: output the scene XML
+      console.log('=== SCENE XML WITH INCLUDE ===');
+      console.log(sceneXml);
+      console.log('=== END SCENE XML ===');
+
+      // 7. Write scene XML to VFS
+      const sceneXmlPath = `${vfsSceneDir}/scene.xml`;
+      this._writeToFS(sceneXmlPath, sceneXml);
 
       this.currentEnv = envName;
       this.currentRobot = robotName;
-      this.mergedScenePath = `merged_${sceneName}.xml`;
+      this.scenePath = `scenes/${robotName}/scene.xml`;
 
-      console.log(`Modular scene loaded: ${mergedPath}`);
-      return this.mergedScenePath;
+      console.log(`Scene loaded: ${this.scenePath}`);
+      return this.scenePath;
 
     } catch (error) {
-      console.error('Modular scene loading failed:', error);
+      console.error('Scene loading failed:', error);
       throw error;
     }
   }
 
   /**
-   * Get robot XML path based on robot name
+   * Create scene XML by inserting include statements into environment XML
    */
-  _getRobotXmlPath(robotName) {
-    const config = SceneManager.ROBOT_CONFIGS[robotName];
-    return config ? config.xmlPath : `./assets/robots/${robotName}/${robotName}.xml`;
-  }
+  _createSceneXml(envXml, robotName, hasObjects, sceneName) {
+    // Parse environment XML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(envXml, 'text/xml');
 
-  /**
-   * Get robot objects XML path
-   */
-  _getObjectsXmlPath(robotName) {
-    const config = SceneManager.ROBOT_CONFIGS[robotName];
-    return config ? config.objectsPath : `./assets/robots/${robotName}/objects.xml`;
-  }
+    if (doc.querySelector('parsererror')) {
+      throw new Error('Failed to parse environment XML');
+    }
 
-  /**
-   * Get robot directory path for mesh resolution
-   */
-  _getRobotDir(robotName) {
-    const config = SceneManager.ROBOT_CONFIGS[robotName];
-    return config ? config.robotDir : robotName;
-  }
+    // Update model name
+    const mujoco = doc.documentElement;
+    mujoco.setAttribute('model', sceneName);
 
-  /**
-   * Get mesh directory name for a robot
-   */
-  _getMeshDir(robotName) {
-    const config = SceneManager.ROBOT_CONFIGS[robotName];
-    return config ? config.meshDir : 'meshes';
+    // Create include element for robot
+    const robotInclude = doc.createElement('include');
+    robotInclude.setAttribute('file', `${robotName}.xml`);
+
+    // Insert include at the beginning (after mujoco tag)
+    mujoco.insertBefore(robotInclude, mujoco.firstChild);
+
+    // Add objects include if exists
+    if (hasObjects) {
+      const objectsInclude = doc.createElement('include');
+      objectsInclude.setAttribute('file', 'objects.xml');
+      // Insert after robot include
+      mujoco.insertBefore(objectsInclude, robotInclude.nextSibling);
+    }
+
+    // Serialize back to string
+    const serializer = new XMLSerializer();
+    let result = serializer.serializeToString(doc);
+
+    // Clean up XML
+    result = result.replace(/(<\?xml[^?]*\?>)/g, '');
+    result = result.replace(/\s+xmlns="[^"]*"/g, '');
+    result = result.replace(/\s+xmlns:[a-z]+="[^"]*"/g, '');
+    result = '<?xml version="1.0" encoding="UTF-8"?>\n' + result.trim();
+
+    return result;
   }
 
   /**
    * Write content to MuJoCo virtual filesystem
    */
   _writeToFS(path, content) {
-    const filename = path.split('/').pop();
-    const dir = path.substring(0, path.lastIndexOf('/'));
-
     // Try to remove existing file
     try {
       this.mujoco.FS.unlink(path);
@@ -191,62 +241,81 @@ export class SceneManager {
     }
 
     // Write new file
-    this.mujoco.FS.writeFile(path, content);
-    console.log(`Written to VFS: ${path}`);
-  }
-
-  /**
-   * Load user-uploaded robot files
-   * @param {FileList} files - Files from input[webkitdirectory]
-   * @param {string} envName - Environment to load robot into
-   * @returns {Promise<string>} - Path to merged scene
-   */
-  async loadUploadedRobot(files, envName = 'tabletop') {
-    // Parse uploaded files
-    const { robotXml, objectsXml, meshFiles, robotName } =
-      await this.robotLoader.loadUploadedRobot(files);
-
-    // Write mesh files to virtual filesystem
-    const robotDir = `/working/uploaded_${robotName}`;
-    this._ensureDir(robotDir);
-    this._ensureDir(`${robotDir}/meshes`);
-
-    for (const [name, buffer] of meshFiles) {
-      const meshPath = `${robotDir}/meshes/${name}`;
-      this.mujoco.FS.writeFile(meshPath, new Uint8Array(buffer));
+    if (typeof content === 'string') {
+      this.mujoco.FS.writeFile(path, content);
+    } else {
+      this.mujoco.FS.writeFile(path, content);
     }
-
-    // Fix mesh paths in robot XML
-    const fixedRobotXml = MujocoXmlMerger.fixMeshPaths(robotXml, robotDir);
-
-    // Load environment
-    const envPath = `./assets/environments/${envName}/scene.xml`;
-    const envResponse = await fetch(envPath);
-    const envXml = await envResponse.text();
-
-    // Merge
-    let mergedXml = MujocoXmlMerger.merge(envXml, fixedRobotXml, objectsXml);
-    const sceneName = `${envName}_uploaded_${robotName}`;
-    mergedXml = MujocoXmlMerger.setModelName(mergedXml, sceneName);
-
-    // Write merged scene
-    const mergedPath = `/working/merged_${sceneName}.xml`;
-    this._writeToFS(mergedPath, mergedXml);
-
-    this.currentEnv = envName;
-    this.currentRobot = `uploaded_${robotName}`;
-    this.mergedScenePath = `merged_${sceneName}.xml`;
-
-    return this.mergedScenePath;
+    console.log(`Written to VFS: ${path}`);
   }
 
   /**
    * Ensure directory exists in virtual filesystem
    */
   _ensureDir(path) {
-    if (!this.mujoco.FS.analyzePath(path).exists) {
-      this.mujoco.FS.mkdir(path);
+    try {
+      if (!this.mujoco.FS.analyzePath(path).exists) {
+        this.mujoco.FS.mkdir(path);
+      }
+    } catch (e) {
+      // Directory might already exist
     }
+  }
+
+  /**
+   * Load user-uploaded robot files
+   * @param {FileList} files - Files from input[webkitdirectory]
+   * @param {string} envName - Environment to load robot into
+   * @returns {Promise<string>} - Path to scene XML
+   */
+  async loadUploadedRobot(files, envName = 'tabletop') {
+    // Parse uploaded files
+    const { robotXml, objectsXml, meshFiles, robotName } =
+      await this.robotLoader.loadUploadedRobot(files);
+
+    const vfsSceneDir = `/working/scenes/uploaded_${robotName}`;
+
+    // Create directories
+    this._ensureDir('/working/scenes');
+    this._ensureDir(vfsSceneDir);
+    this._ensureDir(`${vfsSceneDir}/meshes`);
+
+    // Write mesh files
+    for (const [name, buffer] of meshFiles) {
+      const meshPath = `${vfsSceneDir}/meshes/${name}`;
+      this.mujoco.FS.writeFile(meshPath, new Uint8Array(buffer));
+    }
+
+    // Fix meshdir and write robot XML
+    let fixedRobotXml = robotXml.replace(
+      /meshdir="[^"]*"/g,
+      `meshdir="./meshes/"`
+    );
+    this._writeToFS(`${vfsSceneDir}/robot.xml`, fixedRobotXml);
+
+    // Write objects XML if exists
+    const hasObjects = !!objectsXml;
+    if (hasObjects) {
+      this._writeToFS(`${vfsSceneDir}/objects.xml`, objectsXml);
+    }
+
+    // Load environment XML
+    const envConfig = SceneManager.ENV_CONFIGS[envName];
+    const envResponse = await fetch(envConfig.xmlPath);
+    const envXml = await envResponse.text();
+
+    // Create scene XML with include
+    const sceneName = `${envName}_uploaded_${robotName}`;
+    const sceneXml = this._createSceneXml(envXml, 'robot', hasObjects, sceneName);
+
+    // Write scene XML
+    this._writeToFS(`${vfsSceneDir}/scene.xml`, sceneXml);
+
+    this.currentEnv = envName;
+    this.currentRobot = `uploaded_${robotName}`;
+    this.scenePath = `scenes/uploaded_${robotName}/scene.xml`;
+
+    return this.scenePath;
   }
 
   /**
@@ -256,7 +325,7 @@ export class SceneManager {
     return {
       environment: this.currentEnv,
       robot: this.currentRobot,
-      scenePath: this.mergedScenePath
+      scenePath: this.scenePath
     };
   }
 
@@ -266,21 +335,22 @@ export class SceneManager {
    */
   getSpzPath() {
     if (!this.currentEnv) return null;
-    return `./assets/environments/${this.currentEnv}/scene.spz`;
+    const envConfig = SceneManager.ENV_CONFIGS[this.currentEnv];
+    return envConfig ? envConfig.spzPath : null;
   }
 
   /**
    * List available environments
    */
   listEnvironments() {
-    return ['tabletop'];
+    return Object.keys(SceneManager.ENV_CONFIGS);
   }
 
   /**
    * List available robots
    */
   listRobots() {
-    return ['xlerobot', 'SO101', 'panda', 'humanoid'];
+    return Object.keys(SceneManager.ROBOT_CONFIGS);
   }
 }
 

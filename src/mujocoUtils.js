@@ -405,7 +405,28 @@ export async function loadSceneFromURL(mujoco, filename, parent) {
     }
 
     // Load in the state from XML.
-    parent.model = mujoco.MjModel.loadFromXML("/working/"+filename);
+    const xmlPath = "/working/"+filename;
+    console.log('Loading MuJoCo model from:', xmlPath);
+
+    // Debug: Check if the XML file exists and print its content
+    try {
+      const xmlContent = mujoco.FS.readFile(xmlPath, { encoding: 'utf8' });
+      console.log('XML file content (first 500 chars):', xmlContent.substring(0, 500));
+    } catch (e) {
+      console.error('Failed to read XML file:', e);
+    }
+
+    try {
+      parent.model = mujoco.MjModel.loadFromXML(xmlPath);
+    } catch (e) {
+      console.error('MuJoCo XML load error:', e);
+      console.error('Error message:', e.message);
+      // Try to get more info from MuJoCo's error handling
+      if (mujoco.mjXError) {
+        console.error('MuJoCo error details:', mujoco.mjXError);
+      }
+      throw e;
+    }
     parent.data  = new mujoco.MjData(parent.model);
 
     let model = parent.model;
