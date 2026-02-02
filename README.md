@@ -1,16 +1,6 @@
 <p align="center">
-
-  <a href="https://vector-wangel.github.io/XLeRobot-Web/"><img src="https://github.com/user-attachments/assets/f6880e23-efad-4590-8feb-bbeaf18616b6" href></a>
-  <a href="https://vector-wangel.github.io/XLeRobot-Web/"><img src="https://github.com/user-attachments/assets/8c4577fd-515f-4512-9c79-ba2091cd5820" href></a>
+  <a href="https://vector-wangel.github.io/MuJoCo-GS-Web/"><img src="https://github.com/user-attachments/assets/8c4577fd-515f-4512-9c79-ba2091cd5820" href></a>
 </p>
-
-
-
-## Run XLeRobot in MuJoCo in your Browser.
-
-Load and Run MuJoCo 3.3.8 Models using JavaScript and the official MuJoCo WebAssembly Bindings.
-
-### [See the Live Demo Here](https://vector-wangel.github.io/XLeRobot-Web/)
 
 <table>
   <tr>
@@ -20,9 +10,15 @@ Load and Run MuJoCo 3.3.8 Models using JavaScript and the official MuJoCo WebAss
   </tr>
 </table>
 
+## [Run MuJoCo + 3DGS in your Browser.](https://vector-wangel.github.io/MuJoCo-GS-Web/)
+
+Load and Run MuJoCo 3.3.8 Models using JavaScript and the official MuJoCo WebAssembly Bindings.
+
+
+
 ## Features
 
-- **MuJoCo 3.3.8 WebAssembly**: MuJoCo running entirely in the browser
+- **MuJoCo 3.3.8 WebAssembly**: MuJoCo running entirely in the browser, works on any devices, even your phone.
 
 - **Hybrid Rendering**: Combine MuJoCo with photorealistic 3D Gaussian Splatting scenes imported from [World Labs](https://worldlabs.ai/)
 
@@ -132,6 +128,7 @@ mujoco.mj_applyFT(model, data, [fx, fy, fz], [tx, ty, tz], [px, py, pz], bodyId,
 data.delete();
 model.delete();
 ```
+
 
 
 
