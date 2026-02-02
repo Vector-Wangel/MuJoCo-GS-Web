@@ -488,8 +488,45 @@ class GaussianSplatController {
 const gsController = new GaussianSplatController(demo.container, demo.scene);
 demo.gsController = gsController;  // Attach to demo for render loop access
 
+// GitHub button
+const githubBtn = document.createElement('button');
+githubBtn.textContent = 'GitHub';
+githubBtn.style.cssText = `
+  position: fixed;
+  bottom: 20px;
+  right: 200px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #333 0%, #111 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+`;
+
+githubBtn.onmouseenter = () => {
+  githubBtn.style.transform = 'scale(1.05)';
+  githubBtn.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
+};
+
+githubBtn.onmouseleave = () => {
+  githubBtn.style.transform = 'scale(1)';
+  githubBtn.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+};
+
+githubBtn.onclick = () => {
+  window.open('https://github.com/Vector-Wangel/MuJoCo-GS-Web', '_blank');
+};
+
+document.body.appendChild(githubBtn);
+
+// 3DGS toggle button
 const gsToggleBtn = document.createElement('button');
-gsToggleBtn.textContent = '🌍 Enable 3D Environment';
+gsToggleBtn.textContent = 'Enable 3DGS';
 gsToggleBtn.style.cssText = `
   position: fixed;
   bottom: 20px;
@@ -525,17 +562,17 @@ gsToggleBtn.onclick = async () => {
   try {
     const enabled = await gsController.toggle('./assets/environments/tabletop/scene.spz');
 
-    gsToggleBtn.textContent = enabled ? '🌍 Disable 3D Environment' : '🌍 Enable 3D Environment';
+    gsToggleBtn.textContent = enabled ? 'Disable 3DGS' : 'Enable 3DGS';
     gsToggleBtn.style.background = enabled
       ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
       : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)';
   } catch (err) {
     console.error('Toggle failed:', err);
-    gsToggleBtn.textContent = '❌ Load Failed - Retry';
+    gsToggleBtn.textContent = 'Load Failed - Retry';
     gsToggleBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
     // Reset after 2 seconds
     setTimeout(() => {
-      gsToggleBtn.textContent = '🌍 Enable 3D Environment';
+      gsToggleBtn.textContent = 'Enable 3DGS';
       gsToggleBtn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)';
     }, 2000);
   }
