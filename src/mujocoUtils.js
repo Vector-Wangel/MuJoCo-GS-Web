@@ -791,7 +791,13 @@ export async function downloadExampleScenesFolder(mujoco) {
       }
 
       const filePath = "/working/robots/" + normalizedFiles[i];
-      if (normalizedFiles[i].endsWith(".png") || normalizedFiles[i].endsWith(".stl") || normalizedFiles[i].endsWith(".skn") || normalizedFiles[i].endsWith(".obj") || normalizedFiles[i].endsWith(".ply")) {
+      // Binary files: meshes and textures
+      const isBinary = normalizedFiles[i].endsWith(".png") ||
+                       normalizedFiles[i].endsWith(".stl") ||
+                       normalizedFiles[i].endsWith(".skn") ||
+                       normalizedFiles[i].endsWith(".obj") ||
+                       normalizedFiles[i].endsWith(".ply");
+      if (isBinary) {
           mujoco.FS.writeFile(filePath, new Uint8Array(await responses[i].arrayBuffer()));
       } else {
           mujoco.FS.writeFile(filePath, await responses[i].text());

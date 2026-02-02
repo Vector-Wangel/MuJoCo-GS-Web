@@ -113,7 +113,12 @@ export class SceneManager {
       // 5. Fix mesh paths - meshdir needs to point to the robot folder in VFS
       // Robot files are downloaded to /working/robots/{robotDir}/
       const robotDir = this._getRobotDir(robotName);
+      console.log(`Fixing mesh paths for robot: ${robotName}, robotDir: ${robotDir}`);
       mergedXml = MujocoXmlMerger.fixMeshPaths(mergedXml, `/working/robots/${robotDir}`);
+
+      // Debug: log the compiler tag after fixing
+      const compilerMatch = mergedXml.match(/<compiler[^>]*>/);
+      console.log('Merged XML compiler tag:', compilerMatch ? compilerMatch[0] : 'No compiler found');
 
       // 6. Set model name
       const sceneName = `${envName}_${robotName}`;
