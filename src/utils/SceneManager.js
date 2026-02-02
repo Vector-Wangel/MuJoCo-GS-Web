@@ -68,6 +68,7 @@ export class SceneManager {
     this.currentRobot = null;
     this.scenePath = null;
     this.customSpzData = null;  // Store custom SPZ data from user upload
+    this.customCollisionXml = null;  // Store custom collision XML content
   }
 
   /**
@@ -303,6 +304,39 @@ export class SceneManager {
   }
 
   /**
+   * Set custom collision XML content
+   * @param {string} xmlContent - The collision XML content
+   */
+  setCustomCollision(xmlContent) {
+    this.customCollisionXml = xmlContent;
+    console.log('Custom collision XML set');
+  }
+
+  /**
+   * Clear custom collision XML
+   */
+  clearCustomCollision() {
+    this.customCollisionXml = null;
+    console.log('Custom collision XML cleared');
+  }
+
+  /**
+   * Check if custom collision XML is available
+   * @returns {boolean}
+   */
+  hasCustomCollision() {
+    return this.customCollisionXml !== null;
+  }
+
+  /**
+   * Get custom collision XML content
+   * @returns {string|null}
+   */
+  getCustomCollisionXml() {
+    return this.customCollisionXml;
+  }
+
+  /**
    * Load a custom SPZ file with basic environment
    * @param {File} spzFile - The SPZ file to load
    * @param {string} robotName - Robot to use (default: none)
@@ -359,8 +393,13 @@ export class SceneManager {
         // No objects file
       }
 
-      // Create scene XML with environment and uploaded robot
-      const sceneXml = this._createSceneXml(envXml, 'robot', hasObjects, `custom_spz_${robotName}`);
+      // Write collision.xml if custom collision is set
+      if (this.customCollisionXml) {
+        this._writeToFS(`${uploadedSceneDir}/collision.xml`, this.customCollisionXml);
+      }
+
+      // Create scene XML with environment, collision, and uploaded robot
+      const sceneXml = this._createSceneXmlWithCollision(envXml, 'robot', hasObjects, `custom_spz_${robotName}`, this.hasCustomCollision());
       this._writeToFS(`${uploadedSceneDir}/scene.xml`, sceneXml);
 
       this.currentRobot = robotName;
@@ -376,13 +415,24 @@ export class SceneManager {
     this._ensureDir('/working/scenes');
     this._ensureDir(vfsSceneDir);
 
+    // Write collision.xml if custom collision is set
+    if (this.customCollisionXml) {
+      this._writeToFS(`${vfsSceneDir}/collision.xml`, this.customCollisionXml);
+    }
+
     if (robotName && SceneManager.ROBOT_CONFIGS[robotName]) {
       const hasObjects = await this._copyRobotToDir(robotName, vfsSceneDir);
-      const sceneXml = this._createSceneXml(envXml, robotName, hasObjects, `custom_spz_${robotName}`);
+      const sceneXml = this._createSceneXmlWithCollision(envXml, robotName, hasObjects, `custom_spz_${robotName}`, this.hasCustomCollision());
       this._writeToFS(`${vfsSceneDir}/scene.xml`, sceneXml);
       this.currentRobot = robotName;
     } else {
-      this._writeToFS(`${vfsSceneDir}/scene.xml`, envXml);
+      // No robot - still need to handle collision XML
+      if (this.customCollisionXml) {
+        const sceneXml = this._createSceneXmlWithCollision(envXml, null, false, 'custom_spz', true);
+        this._writeToFS(`${vfsSceneDir}/scene.xml`, sceneXml);
+      } else {
+        this._writeToFS(`${vfsSceneDir}/scene.xml`, envXml);
+      }
       this.currentRobot = null;
     }
 
@@ -391,6 +441,68 @@ export class SceneManager {
 
     console.log(`Custom SPZ scene ready: ${this.scenePath}`);
     return this.scenePath;
+  }
+
+  /**
+   * Create scene XML with optional collision include
+   * @param {string} envXml - Base environment XML
+   * @param {string} robotName - Robot name (or null)
+   * @param {boolean} hasObjects - Whether objects.xml exists
+   * @param {string} sceneName - Scene name for model attribute
+   * @param {boolean} hasCollision - Whether to include collision.xml
+   * @returns {string} - Generated scene XML
+   */
+  _createSceneXmlWithCollision(envXml, robotName, hasObjects, sceneName, hasCollision) {
+    // Parse environment XML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(envXml, 'text/xml');
+
+    if (doc.querySelector('parsererror')) {
+      throw new Error('Failed to parse environment XML');
+    }
+
+    // Update model name
+    const mujoco = doc.documentElement;
+    mujoco.setAttribute('model', sceneName);
+
+    // Insert includes at the beginning (after mujoco tag)
+    // Order: collision -> robot -> objects
+    let insertPoint = mujoco.firstChild;
+
+    // Add collision include if available
+    if (hasCollision) {
+      const collisionInclude = doc.createElement('include');
+      collisionInclude.setAttribute('file', 'collision.xml');
+      mujoco.insertBefore(collisionInclude, insertPoint);
+      insertPoint = collisionInclude.nextSibling;
+    }
+
+    // Add robot include if specified
+    if (robotName) {
+      const robotInclude = doc.createElement('include');
+      robotInclude.setAttribute('file', `${robotName}.xml`);
+      mujoco.insertBefore(robotInclude, insertPoint);
+      insertPoint = robotInclude.nextSibling;
+
+      // Add objects include if exists
+      if (hasObjects) {
+        const objectsInclude = doc.createElement('include');
+        objectsInclude.setAttribute('file', 'objects.xml');
+        mujoco.insertBefore(objectsInclude, insertPoint);
+      }
+    }
+
+    // Serialize back to string
+    const serializer = new XMLSerializer();
+    let result = serializer.serializeToString(doc);
+
+    // Clean up XML
+    result = result.replace(/(<\?xml[^?]*\?>)/g, '');
+    result = result.replace(/\s+xmlns="[^"]*"/g, '');
+    result = result.replace(/\s+xmlns:[a-z]+="[^"]*"/g, '');
+    result = '<?xml version="1.0" encoding="UTF-8"?>\n' + result.trim();
+
+    return result;
   }
 
   /**

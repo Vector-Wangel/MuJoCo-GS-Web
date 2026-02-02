@@ -240,6 +240,46 @@ export function setupGUI(parentContext) {
   };
   parentContext.gui.add(uploadSpzBtn, 'uploadSpz').name('Upload 3DGS (.spz)');
 
+  // Add upload collision XML button for custom SPZ scenes
+  const uploadCollisionBtn = {
+    uploadCollision: () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.xml';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+          console.log('Uploading collision XML file:', file.name);
+          const sceneManager = getSceneManager(parentContext.mujoco);
+
+          // Read the XML content
+          const xmlContent = await file.text();
+          sceneManager.setCustomCollision(xmlContent);
+
+          // If already in custom_spz mode, reload scene with collision
+          if (sceneManager.hasCustomSpz()) {
+            removeOldScene();
+            const robotName = parentContext.params.robot;
+            const scenePath = await sceneManager.loadCustomSpzWithRobot(robotName);
+            await loadSceneAndUpdate(scenePath, robotName);
+            await loadCustomSpz3DGS(sceneManager.getCustomSpzData());
+            console.log('Scene reloaded with collision XML');
+          } else {
+            console.log('Collision XML stored. Upload a SPZ file to use it.');
+            alert('Collision XML loaded. Now upload a SPZ file to create the scene.');
+          }
+        } catch (err) {
+          console.error('Failed to load collision XML:', err);
+          alert('Failed to load collision XML: ' + err.message);
+        }
+      };
+      input.click();
+    }
+  };
+  parentContext.gui.add(uploadCollisionBtn, 'uploadCollision').name('Upload Collision (.xml)');
+
   // Add a help menu.
   // Parameters:
   //  Name: "Help".
