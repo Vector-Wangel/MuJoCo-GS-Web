@@ -8,7 +8,15 @@
     <td><img src="https://github.com/user-attachments/assets/4d398904-d2c3-4f95-b8dc-57d225317f8a" width="250"/></td>
     <td><img src="https://github.com/user-attachments/assets/6f1e9b1e-f7b8-45d0-b563-1cc90d290a65" width="250"/></td>
   </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/17a240fe-b234-44a5-a5ab-c31875b1567c" width="250"/></td>
+    <td><img src="https://github.com/user-attachments/assets/1327e33a-af17-4b73-9b65-f6b531110563" width="250"/></td>
+    <td><img src="https://github.com/user-attachments/assets/10bc5d06-a1f9-4e50-98b8-5df2dffb448f" width="250"/></td>
+  </tr>
 </table>
+
+
+
 
 ## [Run MuJoCo + 3DGS in your Browser.](https://vector-wangel.github.io/MuJoCo-GS-Web/)
 
@@ -145,6 +153,7 @@ model.delete();
 ## 🙏 Acknowledgements
 
 This project is built based on [mujoco-wasm](https://github.com/zalo/mujoco_wasm) and [sparkjs](https://sparkjs.dev/).
+
 
 
 
