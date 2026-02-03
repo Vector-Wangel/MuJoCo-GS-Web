@@ -36,8 +36,8 @@ Load and Run MuJoCo 3.3.8 Models using JavaScript and the official MuJoCo WebAss
   
 - **Import any scene**: use any 3DGS scene you want
   - .spz file, recommend: [Marble from World Labs](https://marble.worldlabs.ai/)
-  - If you upload your own 3DGS file, there will not be any collision
-  - You can contribute to this project by adding a 3DGS scene along with .xml file for collision setup
+  - If you only upload the .spz file, there will not be any collision
+  - You can add a 3DGS scene along with an .xml file for collision setup
   
 <img width="1659" height="558" alt="image" src="https://github.com/user-attachments/assets/50807972-784d-4fa0-a4b3-a2920dff86c9" />
 
@@ -145,6 +145,7 @@ model.delete();
 ## 🙏 Acknowledgements
 
 This project is built based on [mujoco-wasm](https://github.com/zalo/mujoco_wasm) and [sparkjs](https://sparkjs.dev/).
+
 
 
 
