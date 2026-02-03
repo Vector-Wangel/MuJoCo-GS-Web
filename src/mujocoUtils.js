@@ -163,7 +163,8 @@ export function setupGUI(parentContext) {
     "XLeRobot": "xlerobot",
     "SO101": "SO101",
     "Panda": "panda",
-    "Humanoid": "humanoid"
+    "Humanoid": "humanoid",
+    "Unitree G1": "unitree_g1"
   }).name('Robot').onChange(loadScene);
 
   // Add upload robot button
@@ -991,11 +992,12 @@ export async function downloadRobotAssets(mujoco, robotDir) {
     if (!response.ok) {
       throw new Error(`Failed to fetch ${file}: ${response.status}`);
     }
-    const isBinary = file.endsWith(".png") ||
-                     file.endsWith(".stl") ||
-                     file.endsWith(".skn") ||
-                     file.endsWith(".obj") ||
-                     file.endsWith(".ply");
+    const lowerFile = file.toLowerCase();
+    const isBinary = lowerFile.endsWith(".png") ||
+                     lowerFile.endsWith(".stl") ||
+                     lowerFile.endsWith(".skn") ||
+                     lowerFile.endsWith(".obj") ||
+                     lowerFile.endsWith(".ply");
     const data = isBinary
       ? new Uint8Array(await response.arrayBuffer())
       : await response.text();
