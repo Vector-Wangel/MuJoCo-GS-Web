@@ -144,7 +144,8 @@ model.delete();
 
 ## 🙏 Acknowledgements
 
-This project is built based on [mujoco-wasm](https://github.com/zalo/mujoco_wasm) and [sparkjs](https://sparkjs.dev/).
+This project is built based on [mujoco-wasm](https://github.com/zalo/mujoco_wasm), [sparkjs](https://sparkjs.dev/), and [human policy viewer](https://github.com/Axellwppr/humanoid-policy-viewer).
+
 
 
 
