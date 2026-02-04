@@ -5,7 +5,7 @@ Load and Run MuJoCo 3.3.8 Models using JavaScript and the official MuJoCo WebAss
 <table>
   <tr>
     <td><img src="https://github.com/user-attachments/assets/85466388-9868-4319-90bb-e40d331bcdfd" width="250"/></td>
-    <td><img src="https://github.com/user-attachments/assets/4d398904-d2c3-4f95-b8dc-57d225317f8a" width="250"/></td>
+    <td><img src="https://github.com/user-attachments/assets/b24f9d7e-36ba-4908-9b14-23f7d157ac1f" width="250"/></td>
     <td><img src="https://github.com/user-attachments/assets/b41f6159-16c4-4c64-a104-a0ac65586b09" width="250"/></td>
   </tr>
   <tr>
@@ -145,6 +145,7 @@ model.delete();
 ## 🙏 Acknowledgements
 
 This project is built based on [mujoco-wasm](https://github.com/zalo/mujoco_wasm), [sparkjs](https://sparkjs.dev/), and [human policy viewer](https://github.com/Axellwppr/humanoid-policy-viewer).
+
 
 
 
