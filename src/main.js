@@ -493,10 +493,12 @@ await demo.init();
 // ============================================================================
 
 class GaussianSplatController {
-  constructor(container, scene) {
+  constructor(container, scene, renderer) {
     this.container = container;
     this.scene = scene;
+    this.renderer = renderer;
     this.splatMesh = null;
+    this.sparkRenderer = null;
     this.enabled = false;
     this.loading = false;
     this.savedBackground = null;
@@ -523,12 +525,16 @@ class GaussianSplatController {
         console.log('Spark module loaded');
       }
 
-      const { SplatMesh } = this.SparkModule;
+      const { SplatMesh, SparkRenderer } = this.SparkModule;
+
+      // Create SparkRenderer (required in Spark 2.0) and add to scene
+      if (!this.sparkRenderer) {
+        this.sparkRenderer = new SparkRenderer({ renderer: this.renderer });
+        this.scene.add(this.sparkRenderer);
+      }
 
       // Create SplatMesh and add directly to the scene
-      // SplatMesh extends THREE.Object3D, so it integrates with the scene graph
-      // Z-buffer handles depth occlusion automatically with opaque geometry
-      this.splatMesh = new SplatMesh({ url: absoluteSpzUrl });
+      this.splatMesh = new SplatMesh({ url: absoluteSpzUrl, lod: true });
       this.splatMesh.name = 'GaussianSplatMesh';
 
       // Add to scene - Z-buffer will handle occlusion with MuJoCo meshes
@@ -568,11 +574,19 @@ class GaussianSplatController {
     // Remove SplatMesh from scene
     if (this.splatMesh) {
       this.scene.remove(this.splatMesh);
-      // Dispose of SplatMesh resources if available
       if (this.splatMesh.dispose) {
         this.splatMesh.dispose();
       }
       this.splatMesh = null;
+    }
+
+    // Remove SparkRenderer from scene
+    if (this.sparkRenderer) {
+      this.scene.remove(this.sparkRenderer);
+      if (this.sparkRenderer.dispose) {
+        this.sparkRenderer.dispose();
+      }
+      this.sparkRenderer = null;
     }
 
     // Restore scene background
@@ -612,7 +626,7 @@ class GaussianSplatController {
 }
 
 // Create controller and UI button
-const gsController = new GaussianSplatController(demo.container, demo.scene);
+const gsController = new GaussianSplatController(demo.container, demo.scene, demo.renderer);
 demo.gsController = gsController;  // Attach to demo for render loop access
 
 // GitHub button

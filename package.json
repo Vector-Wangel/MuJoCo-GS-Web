@@ -24,10 +24,10 @@
   },
   "homepage": "https://github.com/zalo/mujoco_wasm#readme",
   "dependencies": {
-    "@sparkjsdev/spark": "^0.1.10",
+    "@sparkjsdev/spark": "^2.0.0",
     "esbuild": "^0.25.12",
     "mujoco-js": "^0.0.7",
     "onnxruntime-web": "^1.23.2",
-    "three": "^0.178.0"
+    "three": "0.180.0"
   }
 }

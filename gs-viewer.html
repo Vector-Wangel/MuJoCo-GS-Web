@@ -11,8 +11,8 @@
   <script type="importmap">
   {
     "imports": {
-      "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.178.0/three.module.js",
-      "three/": "https://cdn.jsdelivr.net/npm/three@0.178.0/"
+      "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.180.0/three.module.js",
+      "three/": "https://cdn.jsdelivr.net/npm/three@0.180.0/"
     }
   }
   </script>
@@ -20,7 +20,7 @@
 <body>
   <script type="module">
     import * as THREE from 'three';
-    import { SplatMesh } from 'https://sparkjs.dev/releases/spark/0.1.10/spark.module.js';
+    import { SplatMesh, SparkRenderer } from 'https://sparkjs.dev/releases/spark/2.0.0/spark.module.js';
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 100);
@@ -31,6 +31,10 @@
     renderer.setClearColor(0x000000, 0);
     document.body.appendChild(renderer.domElement);
 
+    // SparkRenderer is required in Spark 2.0
+    const spark = new SparkRenderer({ renderer });
+    scene.add(spark);
+
     let target = new THREE.Vector3(0, 0.7, 0);
     let splat = null;
 
@@ -39,7 +43,7 @@
     const splatUrl = params.get('splat') || './assets/scene.spz';
 
     console.log('GS Viewer: Loading splat from:', splatUrl);
-    splat = new SplatMesh({ url: splatUrl });
+    splat = new SplatMesh({ url: splatUrl, lod: true });
     scene.add(splat);
 
     // Sync camera with parent
